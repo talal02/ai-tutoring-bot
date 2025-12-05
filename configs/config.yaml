@@ -1,0 +1,49 @@
+llm:
+  model_name: "microsoft/Phi-3-mini-4k-instruct"  # Fast, efficient 3.8B parameter model
+
+  device: "cpu"  # Use "cuda" for GPU, "cpu" for CPU
+
+  load_in_4bit: true
+  load_in_8bit: false
+
+  use_cache: true
+  cache_dir: "./cache/models"
+
+  generation:
+    max_new_tokens: 512
+    temperature: 0.7
+    top_p: 0.9
+    top_k: 50
+    repetition_penalty: 1.1
+    do_sample: true
+
+prompts:
+  system_prompt: >
+    You are a knowledgeable and patient history tutor for high school students.
+    Your goal is to help students understand historical concepts through clear explanations,
+    Socratic questioning, and step-by-step guidance. Keep your responses concise and focused.
+
+  hint_prompt_template: >
+    The student is working on: {question}
+    Their current understanding: {student_response}
+
+    Provide a {hint_level} hint to guide them toward the correct answer without giving it away directly.
+    Hint levels: nudge (very subtle), partial (more direct), full (nearly complete answer)
+
+  rag_prompt_template: >
+    Context from curriculum materials:
+    {context}
+
+    Student question: {question}
+
+    Based on the context provided, give a clear and pedagogically sound answer.
+
+logging:
+  level: "INFO"
+  log_file: "./logs/demo.log"
+  console_output: true
+
+app:
+  save_conversations: true
+  conversation_dir: "./data/conversations"
+  max_conversation_history: 10

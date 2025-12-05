@@ -1,0 +1,27 @@
+# Week 1 Requirements - LLM and Dialogue Manager
+# Large Tutoring Models for History Education
+
+# Core Dependencies
+torch>=2.0.0
+transformers>=4.35.0
+accelerate>=0.25.0
+
+# Model Optimization
+bitsandbytes>=0.41.0         # For 4-bit/8-bit quantization
+peft>=0.7.0                  # For LoRA adapters (future use)
+
+# Configuration & Data
+pyyaml>=6.0                  # YAML configuration files
+
+# Utilities
+numpy>=1.24.0
+tqdm>=4.65.0                 # Progress bars
+
+# Optional: For better performance on CUDA
+# If you have NVIDIA GPU, install PyTorch with CUDA:
+# pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
+
+# Development Tools (Optional)
+# pytest>=7.4.0              # For running tests
+# black>=23.0.0              # Code formatting
+# flake8>=6.0.0              # Linting
