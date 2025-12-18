@@ -1,7 +1,4 @@
-"""
-Dialogue Manager for managing conversation flow and state.
-Tracks conversation history, lesson progress, and ensures pedagogical coherence.
-"""
+"""Dialogue manager for conversation flow and state tracking."""
 
 from typing import Dict, List, Optional, Any
 from dataclasses import dataclass, field
@@ -10,7 +7,6 @@ from enum import Enum
 import sys
 from pathlib import Path
 
-# Add parent directory to path
 sys.path.append(str(Path(__file__).parent.parent))
 
 from utils.logger import get_logger
@@ -20,20 +16,17 @@ logger = get_logger(__name__)
 
 
 class LessonPhase(Enum):
-    """Current phase of the lesson."""
-    INTRODUCTION = "introduction"      # Introducing topic
-    EXPLORATION = "exploration"        # Exploring concepts
-    PRACTICE = "practice"             # Practicing with questions
-    ASSESSMENT = "assessment"         # Assessing understanding
-    REVIEW = "review"                 # Reviewing learned material
-    COMPLETED = "completed"           # Lesson completed
+    """Lesson phase."""
+    LEARNING = "learning"
+    PRACTICE = "practice"
+    ASSESSMENT = "assessment"
 
 
 @dataclass
 class LessonState:
-    """Tracks state of current lesson."""
+    """Current lesson state."""
     topic: str = "general"
-    phase: LessonPhase = LessonPhase.INTRODUCTION
+    phase: LessonPhase = LessonPhase.LEARNING
     current_question: Optional[str] = None
     attempts: int = 0
     hints_given: List[str] = field(default_factory=list)
@@ -47,7 +40,7 @@ class LessonState:
     def reset(self) -> None:
         """Reset lesson state for new lesson."""
         self.topic = "general"
-        self.phase = LessonPhase.INTRODUCTION
+        self.phase = LessonPhase.LEARNING
         self.current_question = None
         self.attempts = 0
         self.hints_given = []
@@ -75,7 +68,7 @@ class LessonState:
 
 @dataclass
 class ConversationTurn:
-    """Represents a single turn in conversation."""
+    """Single conversation turn."""
     timestamp: datetime
     user_message: str
     intent: Intent
@@ -85,18 +78,10 @@ class ConversationTurn:
 
 
 class ConversationState:
-    """
-    Manages overall conversation state.
-    Tracks history, context, and provides utilities for dialogue management.
-    """
+    """Manages conversation state and history."""
 
     def __init__(self, max_history: int = 20):
-        """
-        Initialize conversation state.
-
-        Args:
-            max_history: Maximum number of turns to keep in history.
-        """
+        """Initialize conversation state."""
         self.max_history = max_history
         self.turns: List[ConversationTurn] = []
         self.context: Dict[str, Any] = {}
@@ -112,16 +97,7 @@ class ConversationState:
         lesson_state: Dict[str, Any],
         metadata: Optional[Dict[str, Any]] = None,
     ) -> None:
-        """
-        Add a conversation turn.
-
-        Args:
-            user_message: User's message.
-            intent: Detected intent.
-            system_response: System's response.
-            lesson_state: Current lesson state.
-            metadata: Optional metadata.
-        """
+        """Add a conversation turn."""
         turn = ConversationTurn(
             timestamp=datetime.now(),
             user_message=user_message,
@@ -133,22 +109,13 @@ class ConversationState:
 
         self.turns.append(turn)
 
-        # Limit history size
         if len(self.turns) > self.max_history:
             self.turns = self.turns[-self.max_history:]
 
         logger.debug(f"Added turn with intent: {intent.value}")
 
     def get_recent_turns(self, n: int = 5) -> List[ConversationTurn]:
-        """
-        Get recent conversation turns.
-
-        Args:
-            n: Number of recent turns to retrieve.
-
-        Returns:
-            List of recent turns.
-        """
+        """Get recent conversation turns."""
         return self.turns[-n:] if self.turns else []
 
     def get_last_turn(self) -> Optional[ConversationTurn]:
@@ -156,15 +123,7 @@ class ConversationState:
         return self.turns[-1] if self.turns else None
 
     def get_context_for_llm(self, n: int = 5) -> List[Dict[str, str]]:
-        """
-        Get conversation history formatted for LLM.
-
-        Args:
-            n: Number of recent turns to include.
-
-        Returns:
-            List of message dictionaries for LLM.
-        """
+        """Get conversation history formatted for LLM."""
         recent_turns = self.get_recent_turns(n)
         messages = []
 
@@ -243,10 +202,7 @@ class ConversationState:
 
 
 class DialogueManager:
-    """
-    Manages dialogue flow and orchestrates conversation.
-    Coordinates intent detection, state management, and response generation.
-    """
+    """Manages dialogue flow and coordinates intent detection."""
 
     def __init__(self):
         """Initialize dialogue manager."""
@@ -260,30 +216,18 @@ class DialogueManager:
         self,
         message: str,
     ) -> Dict[str, Any]:
-        """
-        Process user message and determine response strategy.
-
-        Args:
-            message: User's message.
-
-        Returns:
-            Dictionary with processing results and instructions.
-        """
+        """Process user message and determine response strategy."""
         logger.info(f"Processing message: '{message[:50]}...'")
 
-        # Detect intent
         context = self._build_context_for_intent()
         intent_result = self.intent_detector.detect(message, context)
 
-        # Update lesson state
         self.lesson.update()
 
-        # Determine response strategy based on intent
         response_strategy = self._determine_response_strategy(
             message, intent_result
         )
 
-        # Update context
         self._update_context(message, intent_result)
 
         logger.debug(f"Response strategy: {response_strategy['action']}")
