@@ -1,3 +1,8 @@
+"""
+Configuration management for the Large Tutoring Models system.
+Handles loading and validation of configuration from YAML files.
+"""
+
 import os
 from pathlib import Path
 from typing import Any, Dict, Optional
@@ -7,6 +12,7 @@ from dataclasses import dataclass, field
 
 @dataclass
 class LLMConfig:
+    """LLM-specific configuration."""
     model_name: str = "microsoft/Phi-3-mini-4k-instruct"
     device: str = "cuda"
     load_in_4bit: bool = False
@@ -25,6 +31,7 @@ class LLMConfig:
 
 @dataclass
 class RAGConfig:
+    """RAG-specific configuration."""
     embedding_model: str = "sentence-transformers/all-MiniLM-L6-v2"
     chunking: Dict[str, Any] = field(default_factory=lambda: {
         "chunk_size": 512,
@@ -50,6 +57,7 @@ class RAGConfig:
 
 @dataclass
 class FineTuningConfig:
+    """Fine-tuning configuration."""
     lora: Dict[str, Any] = field(default_factory=lambda: {
         "r": 16,
         "lora_alpha": 32,
@@ -71,6 +79,7 @@ class FineTuningConfig:
 
 @dataclass
 class PromptsConfig:
+    """Prompts configuration."""
     system_prompt: str = (
         "You are a knowledgeable and patient history tutor for high school students. "
         "Your goal is to help students understand historical concepts through clear explanations, "
@@ -93,6 +102,7 @@ class PromptsConfig:
 
 @dataclass
 class LoggingConfig:
+    """Logging configuration."""
     level: str = "INFO"
     log_file: str = "./logs/tutor.log"
     console_output: bool = True
@@ -100,13 +110,22 @@ class LoggingConfig:
 
 @dataclass
 class AppConfig:
+    """Application-wide configuration."""
     save_conversations: bool = True
     conversation_dir: str = "./data/conversations"
     max_conversation_history: int = 10
 
 
 class Config:
+    """Main configuration class that aggregates all sub-configurations."""
+
     def __init__(self, config_path: Optional[str] = None):
+        """
+        Initialize configuration from YAML file.
+
+        Args:
+            config_path: Path to YAML config file. If None, uses default config.
+        """
         self.llm = LLMConfig()
         self.rag = RAGConfig()
         self.fine_tuning = FineTuningConfig()

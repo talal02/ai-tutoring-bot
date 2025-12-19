@@ -1,3 +1,8 @@
+"""
+Logging utilities for the Large Tutoring Models system.
+Provides consistent logging across all components.
+"""
+
 import logging
 import sys
 from pathlib import Path
@@ -6,6 +11,9 @@ from datetime import datetime
 
 
 class ColoredFormatter(logging.Formatter):
+    """Custom formatter with color support for console output."""
+
+    # ANSI color codes
     COLORS = {
         'DEBUG': '\033[36m',      # Cyan
         'INFO': '\033[32m',       # Green

@@ -1,3 +1,8 @@
+"""
+Model loading utilities for various open-source LLMs.
+Supports multiple model families with optimized loading strategies.
+"""
+
 import torch
 from transformers import (
     AutoModelForCausalLM,
@@ -19,6 +24,11 @@ logger = get_logger(__name__)
 
 
 class ModelLoader:
+    """
+    Handles loading of LLMs with support for quantization and LoRA adapters.
+    """
+
+    # Predefined model configurations for popular models
     MODEL_CONFIGS = {
         "phi-3-mini": "microsoft/Phi-3-mini-4k-instruct",
         "phi-3-small": "microsoft/Phi-3-small-8k-instruct",
@@ -29,13 +39,21 @@ class ModelLoader:
     }
 
     def __init__(self, config: LLMConfig):
+        """
+        Initialize model loader.
+
+        Args:
+            config: LLM configuration object.
+        """
         self.config = config
         self.model = None
         self.tokenizer = None
         self.device = self._get_device()
+
         logger.info(f"ModelLoader initialized with device: {self.device}")
 
     def _get_device(self) -> str:
+        """Determine the appropriate device for model loading."""
         if self.config.device == "cuda" and torch.cuda.is_available():
             return "cuda"
         elif self.config.device == "mps" and torch.backends.mps.is_available():
@@ -45,14 +63,29 @@ class ModelLoader:
             return "cpu"
 
     def _get_model_name(self) -> str:
+        """
+        Resolve model name from config or shortcuts.
+
+        Returns:
+            Full model path/name for HuggingFace.
+        """
         model_name = self.config.model_name
+
+        # Check if it's a shortcut
         if model_name in self.MODEL_CONFIGS:
             resolved_name = self.MODEL_CONFIGS[model_name]
             logger.info(f"Resolved '{model_name}' to '{resolved_name}'")
             return resolved_name
+
         return model_name
 
     def _get_quantization_config(self) -> Optional[BitsAndBytesConfig]:
+        """
+        Create quantization config if needed.
+
+        Returns:
+            BitsAndBytesConfig or None.
+        """
         if self.config.load_in_4bit:
             logger.info("Loading model with 4-bit quantization")
             return BitsAndBytesConfig(
@@ -69,31 +102,48 @@ class ModelLoader:
 
         return None
 
-    def load_model(self, adapter_path: Optional[str] = None) -> Tuple[AutoModelForCausalLM, AutoTokenizer]:
+    def load_model(
+        self,
+        adapter_path: Optional[str] = None,
+    ) -> Tuple[AutoModelForCausalLM, AutoTokenizer]:
+        """
+        Load model and tokenizer.
+
+        Args:
+            adapter_path: Optional path to LoRA adapter weights.
+
+        Returns:
+            Tuple of (model, tokenizer).
+
+        Raises:
+            Exception: If model loading fails.
+        """
         try:
             model_name = self._get_model_name()
             logger.info(f"Loading model: {model_name}")
 
+            # Load tokenizer
             logger.info("Loading tokenizer...")
             self.tokenizer = AutoTokenizer.from_pretrained(
                 model_name,
                 trust_remote_code=True,
                 cache_dir=self.config.cache_dir if self.config.use_cache else None,
-                revision="main",
             )
 
+            # Ensure pad token is set
             if self.tokenizer.pad_token is None:
                 self.tokenizer.pad_token = self.tokenizer.eos_token
                 logger.info("Set pad_token to eos_token")
 
+            # Get quantization config
             quant_config = self._get_quantization_config()
 
+            # Load model
             logger.info("Loading model weights...")
             model_kwargs = {
                 "trust_remote_code": True,
                 "cache_dir": self.config.cache_dir if self.config.use_cache else None,
                 "torch_dtype": torch.float16 if self.device == "cuda" else torch.float32,
-                "revision": "main",
             }
 
             if quant_config:
@@ -102,15 +152,27 @@ class ModelLoader:
             else:
                 model_kwargs["device_map"] = self.device
 
-            self.model = AutoModelForCausalLM.from_pretrained(model_name, **model_kwargs)
+            self.model = AutoModelForCausalLM.from_pretrained(
+                model_name,
+                **model_kwargs,
+            )
 
+            # Load LoRA adapter if specified
             if adapter_path:
                 logger.info(f"Loading LoRA adapter from: {adapter_path}")
-                self.model = PeftModel.from_pretrained(self.model, adapter_path)
+                self.model = PeftModel.from_pretrained(
+                    self.model,
+                    adapter_path,
+                )
 
+            # Set to evaluation mode
             self.model.eval()
 
-            logger.info(f"Model loaded successfully. Parameters: {self.get_model_size():.2f}B")
+            logger.info(
+                f"Model loaded successfully. "
+                f"Parameters: {self.get_model_size():.2f}B"
+            )
+
             return self.model, self.tokenizer
 
         except Exception as e:
@@ -118,12 +180,25 @@ class ModelLoader:
             raise
 
     def get_model_size(self) -> float:
+        """
+        Calculate model size in billions of parameters.
+
+        Returns:
+            Number of parameters in billions.
+        """
         if self.model is None:
             return 0.0
+
         total_params = sum(p.numel() for p in self.model.parameters())
         return total_params / 1e9
 
     def get_memory_usage(self) -> dict:
+        """
+        Get current memory usage statistics.
+
+        Returns:
+            Dictionary with memory usage info.
+        """
         stats = {
             "device": self.device,
             "model_loaded": self.model is not None,
@@ -137,6 +212,7 @@ class ModelLoader:
         return stats
 
     def unload_model(self) -> None:
+        """Unload model from memory and clear cache."""
         if self.model is not None:
             logger.info("Unloading model from memory")
             del self.model
@@ -146,9 +222,11 @@ class ModelLoader:
             del self.tokenizer
             self.tokenizer = None
 
+        # Clear CUDA cache if applicable
         if torch.cuda.is_available():
             torch.cuda.empty_cache()
             logger.info("Cleared CUDA cache")
 
     def __del__(self):
+        """Cleanup on deletion."""
         self.unload_model()
