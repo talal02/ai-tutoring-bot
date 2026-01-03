@@ -1,4 +1,5 @@
 .venv
 cache
 examples
-data
+data/conversations
+data/vector_store
