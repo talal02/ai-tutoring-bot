@@ -6,6 +6,7 @@ Handles loading, chunking, and cleaning of curriculum materials.
 import json
 import re
 from pathlib import Path
+from pypdf import PdfReader
 from typing import List, Dict, Optional, Union
 from dataclasses import dataclass
 import sys
@@ -123,6 +124,46 @@ class DocumentProcessor:
 
         return Document(text=text, metadata=doc_metadata)
 
+    def load_pdf_file(
+        self,
+        file_path: str,
+        metadata: Optional[Dict] = None,
+    ) -> Document:
+        """
+        Load a single PDF file.
+
+        Args:
+            file_path: Path to PDF file.
+            metadata: Optional metadata dictionary.
+
+        Returns:
+            Document object with extracted text.
+        """        
+        path = Path(file_path)
+        if not path.exists():
+            raise FileNotFoundError(f"File not found: {file_path}")
+
+        logger.info(f"Loading PDF: {file_path}")
+        
+        reader = PdfReader(str(path))
+        text_parts = []
+        
+        for page_num, page in enumerate(reader.pages):
+            page_text = page.extract_text()
+            if page_text.strip():
+                text_parts.append(page_text)
+        
+        text = "\n\n".join(text_parts)
+        
+        doc_metadata = metadata or {}
+        doc_metadata["source"] = str(path)
+        doc_metadata["filename"] = path.name
+        doc_metadata["num_pages"] = len(reader.pages)
+        doc_metadata["file_type"] = "pdf"
+
+        logger.info(f"Loaded PDF with {len(reader.pages)} pages, {len(text)} characters")
+        return Document(text=text, metadata=doc_metadata)
+
     def load_directory(
         self,
         directory_path: str,
@@ -153,7 +194,11 @@ class DocumentProcessor:
 
         for file_path in files:
             try:
-                doc = self.load_text_file(str(file_path))
+                # Determine file type and use appropriate loader
+                if file_path.suffix.lower() == '.pdf':
+                    doc = self.load_pdf_file(str(file_path))
+                else:
+                    doc = self.load_text_file(str(file_path))
                 documents.append(doc)
             except Exception as e:
                 logger.warning(f"Failed to load {file_path}: {e}")

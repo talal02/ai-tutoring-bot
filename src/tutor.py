@@ -81,17 +81,17 @@ class HistoryTutor:
     def setup_rag(
         self,
         dataset_path: Optional[str] = None,
+        pdf_directory: Optional[str] = None,
         index_name: str = "history_index",
         rebuild_index: bool = False,
     ) -> None:
         """Setup RAG system with FAISS retrieval."""
-        self.logger.info("Setting up RAG layer...")
-
         self.doc_processor = DocumentProcessor(self.config.rag)
         self.embedder = Embedder(self.config.rag)
         self.embedder.load_model()
         self.retriever = FAISSRetriever(self.config.rag, self.embedder)
 
+        # Try to load existing index
         if not rebuild_index:
             try:
                 self.retriever.load_index(index_name)
@@ -100,14 +100,34 @@ class HistoryTutor:
             except FileNotFoundError:
                 self.logger.info("No existing index found, building new one")
 
+        # Build new index from multiple sources
+        all_documents = []
+        
+        # Load JSON dataset if provided
         if dataset_path:
             documents = self.doc_processor.load_json_dataset(dataset_path)
-            processed_docs = self.doc_processor.process_documents(documents, chunk=True)
+            all_documents.extend(documents)
+            self.logger.info(f"Loaded {len(documents)} documents from JSON dataset")
+        
+        # Load PDFs from directory if provided
+        if pdf_directory:
+            pdf_docs = self.doc_processor.load_directory(
+                pdf_directory,
+                file_pattern="*.pdf",
+                recursive=False
+            )
+            all_documents.extend(pdf_docs)
+            self.logger.info(f"Loaded {len(pdf_docs)} PDF documents")
+        
+        if all_documents:
+            processed_docs = self.doc_processor.process_documents(all_documents, chunk=True)
             self.retriever.build_index(processed_docs, show_progress=True)
             self.retriever.save_index(index_name)
 
             stats = self.doc_processor.get_statistics(processed_docs)
             self.logger.info(f"RAG setup complete. Stats: {stats}")
+        else:
+            self.logger.warning("No documents loaded for RAG system")
 
     def chat(self, message: str) -> str:
         """
@@ -258,7 +278,7 @@ def main():
     tutor.setup_llm()
 
     print("\nSetting up RAG system...")
-    tutor.setup_rag(dataset_path=args.dataset, rebuild_index=args.rebuild_index)
+    tutor.setup_rag(dataset_path=args.dataset, rebuild_index=args.rebuild_index, pdf_directory="./data")
 
     print("\n" + "="*70)
     print("SYSTEM READY")

@@ -1,27 +1,52 @@
-# Week 1 Requirements - LLM and Dialogue Manager
-# Large Tutoring Models for History Education
-
-# Core Dependencies
+# Core ML/DL frameworks
 torch>=2.0.0
 transformers>=4.35.0
+peft>=0.6.0
 accelerate>=0.25.0
 
-# Model Optimization
-bitsandbytes>=0.41.0         # For 4-bit/8-bit quantization
-peft>=0.7.0                  # For LoRA adapters (future use)
+# RAG and embeddings
+sentence-transformers>=2.2.0
+faiss-cpu==1.7.4  # Pinned for CentOS 7 compatibility (has pre-built wheels)
+pypdf>=3.0.0
 
-# Configuration & Data
-pyyaml>=6.0                  # YAML configuration files
+# Quantization (for 4-bit/8-bit models)
+bitsandbytes>=0.41.0
 
-# Utilities
-numpy>=1.24.0
-tqdm>=4.65.0                 # Progress bars
+# Utilities - COMPATIBLE VERSIONS FOR CENTOS 7
+numpy>=1.24.0,<2.0.0
+scipy>=1.10.0,<1.12.0
+pandas>=1.5.0,<2.0.0  # Use pandas 1.x for CentOS 7 compatibility
 
-# Optional: For better performance on CUDA
-# If you have NVIDIA GPU, install PyTorch with CUDA:
-# pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
+# Configuration and logging
+pyyaml>=6.0
+python-dotenv>=1.0.0
+typing-extensions>=4.5.0  # Required by PyTorch and Transformers
 
-# Development Tools (Optional)
-# pytest>=7.4.0              # For running tests
-# black>=23.0.0              # Code formatting
-# flake8>=6.0.0              # Linting
+# Core dependencies (often missing on minimal installs)
+filelock>=3.12.0
+fsspec>=2023.6.0
+jinja2>=3.1.2
+networkx>=3.1
+sympy==1.12  # Pin to 1.12 for CentOS 7 compatibility
+huggingface-hub>=0.20.0
+scikit-learn>=1.3.0,<1.4.0  # Constrain for CentOS 7
+click>=8.0.0
+mypy-extensions>=0.4.3
+packaging>=22.0
+pathspec>=0.9.0
+platformdirs>=2.0.0
+tomli>=1.1.0
+
+# Optional: Web interface
+flask>=3.0.0
+flask-cors>=4.0.0
+
+# Optional: Development and testing
+pytest>=7.4.0
+pytest-cov>=4.1.0
+black>=23.0.0
+flake8>=6.0.0
+
+# Optional: Progress bars and visualization
+tqdm>=4.65.0
+matplotlib>=3.7.0,<3.9.0

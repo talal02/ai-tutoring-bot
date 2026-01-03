@@ -1,14 +1,10 @@
+# Large Tutoring Models - Configuration File
+
+# LLM Configuration
 llm:
-  model_name: "microsoft/Phi-3-mini-4k-instruct"  # Fast, efficient 3.8B parameter model
+  model_name: "meta-llama/Llama-3.1-8B-Instruct"
 
-  device: "cpu"  # Use "cuda" for GPU, "cpu" for CPU
-
-  load_in_4bit: true
-  load_in_8bit: false
-
-  use_cache: true
-  cache_dir: "./cache/models"
-
+  # Generation parameters
   generation:
     max_new_tokens: 512
     temperature: 0.7
@@ -17,32 +13,94 @@ llm:
     repetition_penalty: 1.1
     do_sample: true
 
+  # Device configuration
+  device: "cuda"  # "cuda", "cpu"
+  load_in_4bit: false  # Enable for QLoRA/memory savings
+  load_in_8bit: false
+
+  # Cache settings
+  use_cache: true
+  cache_dir: "./cache/models"
+
+# RAG Configuration
+rag:
+  embedding_model: "sentence-transformers/all-MiniLM-L6-v2"
+
+  # Document processing
+  chunking:
+    chunk_size: 512
+    chunk_overlap: 50
+    separator: "\n\n"
+
+  # Retrieval settings
+  retrieval:
+    top_k: 5
+    similarity_threshold: 0.3
+    use_reranking: false
+    reranker_model: null  # e.g., "cross-encoder/ms-marco-MiniLM-L-6-v2"
+
+  vector_store:
+    type: "faiss"  # "faiss" or "chroma"
+    index_type: "IndexFlatL2"  # FAISS index type
+    persist_directory: "./data/vector_store"
+
+  # Embedding cache
+  embedding_cache:
+    enabled: true
+    cache_dir: "./cache/embeddings"
+
+# Fine-tuning Configuration
+fine_tuning:
+  # LoRA parameters
+  lora:
+    r: 16
+    lora_alpha: 32
+    lora_dropout: 0.05
+    target_modules: ["q_proj", "v_proj", "k_proj", "o_proj"]
+    bias: "none"
+    task_type: "CAUSAL_LM"
+
+  # Training parameters
+  training:
+    num_epochs: 3
+    batch_size: 4
+    gradient_accumulation_steps: 4
+    learning_rate: 2.0e-4
+    warmup_steps: 100
+    max_seq_length: 1024
+    output_dir: "./models/finetuned"
+
+# Prompts Configuration
 prompts:
-  system_prompt: >
+  system_prompt: |
     You are a knowledgeable and patient history tutor for high school students.
     Your goal is to help students understand historical concepts through clear explanations,
-    Socratic questioning, and step-by-step guidance. Keep your responses concise and focused.
+    Socratic questioning, and step-by-step guidance. Always ground your responses in
+    curriculum materials and avoid speculation.
 
-  hint_prompt_template: >
-    The student is working on: {question}
-    Their current understanding: {student_response}
-
-    Provide a {hint_level} hint to guide them toward the correct answer without giving it away directly.
-    Hint levels: nudge (very subtle), partial (more direct), full (nearly complete answer)
-
-  rag_prompt_template: >
+  rag_prompt_template: |
     Context from curriculum materials:
     {context}
 
     Student question: {question}
 
     Based on the context provided, give a clear and pedagogically sound answer.
+    If the context doesn't contain enough information, acknowledge this limitation.
 
+  hint_prompt_template: |
+    The student is working on: {question}
+    Their current understanding: {student_response}
+
+    Provide a {hint_level} hint to guide them toward the correct answer without giving it away directly.
+    Hint levels: nudge (very subtle), partial (more direct), full (nearly complete answer)
+
+# Logging Configuration
 logging:
-  level: "INFO"
-  log_file: "./logs/demo.log"
+  level: "INFO"  # DEBUG, INFO, WARNING, ERROR
+  log_file: "./logs/tutor.log"
   console_output: true
 
+# Application Settings
 app:
   save_conversations: true
   conversation_dir: "./data/conversations"
