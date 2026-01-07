@@ -41,8 +41,6 @@ class RAGConfig:
     retrieval: Dict[str, Any] = field(default_factory=lambda: {
         "top_k": 5,
         "similarity_threshold": 0.3,
-        "use_reranking": False,
-        "reranker_model": None,
     })
     vector_store: Dict[str, Any] = field(default_factory=lambda: {
         "type": "faiss",
@@ -52,28 +50,6 @@ class RAGConfig:
     embedding_cache: Dict[str, Any] = field(default_factory=lambda: {
         "enabled": True,
         "cache_dir": "./cache/embeddings",
-    })
-
-
-@dataclass
-class FineTuningConfig:
-    """Fine-tuning configuration."""
-    lora: Dict[str, Any] = field(default_factory=lambda: {
-        "r": 16,
-        "lora_alpha": 32,
-        "lora_dropout": 0.05,
-        "target_modules": ["q_proj", "v_proj", "k_proj", "o_proj"],
-        "bias": "none",
-        "task_type": "CAUSAL_LM",
-    })
-    training: Dict[str, Any] = field(default_factory=lambda: {
-        "num_epochs": 3,
-        "batch_size": 4,
-        "gradient_accumulation_steps": 4,
-        "learning_rate": 2.0e-4,
-        "warmup_steps": 100,
-        "max_seq_length": 1024,
-        "output_dir": "./models/finetuned",
     })
 
 
@@ -128,7 +104,6 @@ class Config:
         """
         self.llm = LLMConfig()
         self.rag = RAGConfig()
-        self.fine_tuning = FineTuningConfig()
         self.prompts = PromptsConfig()
         self.logging = LoggingConfig()
         self.app = AppConfig()
@@ -161,10 +136,6 @@ class Config:
         # Update RAG config
         if 'rag' in config_dict:
             self._update_dataclass(self.rag, config_dict['rag'])
-
-        # Update fine-tuning config
-        if 'fine_tuning' in config_dict:
-            self._update_dataclass(self.fine_tuning, config_dict['fine_tuning'])
 
         # Update prompts config
         if 'prompts' in config_dict:
@@ -206,7 +177,6 @@ class Config:
         config_dict = {
             'llm': self._dataclass_to_dict(self.llm),
             'rag': self._dataclass_to_dict(self.rag),
-            'fine_tuning': self._dataclass_to_dict(self.fine_tuning),
             'prompts': self._dataclass_to_dict(self.prompts),
             'logging': self._dataclass_to_dict(self.logging),
             'app': self._dataclass_to_dict(self.app),
@@ -230,7 +200,6 @@ class Config:
             self.rag.vector_store['persist_directory'],
             self.rag.embedding_cache['cache_dir'],
             self.app.conversation_dir,
-            self.fine_tuning.training['output_dir'],
             os.path.dirname(self.logging.log_file),
         ]
 

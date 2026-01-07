@@ -4,7 +4,7 @@ from peft import PeftModel
 import json
 
 
-def load_base_model(model_name: str = "meta-llama/Llama-3.1-8B-Instruct"):
+def load_base_model(model_name: str = "meta-llama/Llama-3.2-3B-Instruct"):
     print("Loading base model...")
     tokenizer = AutoTokenizer.from_pretrained(model_name, trust_remote_code=True)
     model = AutoModelForCausalLM.from_pretrained(
@@ -18,7 +18,7 @@ def load_base_model(model_name: str = "meta-llama/Llama-3.1-8B-Instruct"):
 
 
 def load_finetuned_model(
-    base_model_name: str = "meta-llama/Llama-3.1-8B-Instruct",
+    base_model_name: str = "meta-llama/Llama-3.2-3B-Instruct",
     adapter_path: str = "models/finetuned/final"
 ):
     print("Loading fine-tuned model...")
@@ -36,7 +36,7 @@ def load_finetuned_model(
     return model, tokenizer
 
 
-def generate_answer(model, tokenizer, question: str, max_tokens: int = 256):
+def generate_answer(model, tokenizer, question: str, max_tokens: int = 1024):
     prompt = f"""<|system|>
 You are a helpful and patient history tutor for high school students. Provide clear, accurate, and pedagogically sound explanations.<|end|>
 <|user|>
@@ -62,6 +62,9 @@ You are a helpful and patient history tutor for high school students. Provide cl
         answer = response.split("<|assistant|>")[-1].strip()
     else:
         answer = response.strip()
+    
+    if "<|end|>" in answer:
+        answer = answer.split("<|end|>")[0].strip()
 
     return answer
 
@@ -71,11 +74,11 @@ def compare_models():
     print("-" * 80)
 
     test_questions = [
-        "What is the difference between primary and secondary sources?",
-        "Explain the concept of cause and consequence in history.",
-        "How do historians interpret historical events?",
-        "What is chronology and why is it important in history?",
-        "Describe the process of analyzing historical sources."
+        "What does the architectural evidence of the Berlin Wall reveal about the nature of division between East and West?",
+        "What does the evidence of hyperinflation in 1923 reveal about the Weimar Republic's economic problems?",
+        "What do the terms of the 1970 Moscow Treaty and 1970 Warsaw Treaty reveal about Willy Brandt's approach to improving East-West relations?",
+        "What do images and descriptions of East German housing reveal about life under communist rule?",
+        "DWhat was Helmut Kohl's 10 Point Plan proposed on 28th November 1989, and what did it aim to achieve?"
     ]
 
     base_model, base_tokenizer = load_base_model()
@@ -97,39 +100,6 @@ def compare_models():
     print("\nComparison complete")
 
 
-def save_comparison_results():
-    print("Saving comparison results...")
-
-    test_questions = [
-        "What is the difference between primary and secondary sources?",
-        "Explain the concept of cause and consequence in history."
-    ]
-
-    base_model, base_tokenizer = load_base_model()
-    finetuned_model, finetuned_tokenizer = load_finetuned_model()
-
-    results = []
-    for question in test_questions:
-        base_answer = generate_answer(base_model, base_tokenizer, question)
-        finetuned_answer = generate_answer(finetuned_model, finetuned_tokenizer, question)
-
-        results.append({
-            "question": question,
-            "base_model_answer": base_answer,
-            "finetuned_model_answer": finetuned_answer
-        })
-
-    output_file = "data/finetuning/comparison_results.json"
-    with open(output_file, 'w', encoding='utf-8') as f:
-        json.dump(results, f, indent=2, ensure_ascii=False)
-
-    print(f"Results saved to: {output_file}")
-
 
 if __name__ == "__main__":
-    import sys
-
-    if len(sys.argv) > 1 and sys.argv[1] == "--save":
-        save_comparison_results()
-    else:
-        compare_models()
+    compare_models()
