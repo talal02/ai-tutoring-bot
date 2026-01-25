@@ -1,0 +1,24 @@
+======================================================================
+MODEL EVALUATION REPORT
+Generated: 2026-01-15 16:32:47
+======================================================================
+Metric                   Base Model          Fine-tuned (LoRA)   Base + RAG          
+----------------------------------------------------------------------
+BLEU Combined            0.0218              0.0362              0.2572              
+ROUGE-1                  0.2459              0.3227              0.5404              
+ROUGE-L                  0.1475              0.1931              0.4401              
+Semantic Similarity      0.8025              0.8019              0.8853              
+Reference Similarity     0.8025              0.8019              0.8853              
+
+BEST MODEL PER METRIC:
+  BLEU Combined: Base + RAG (0.2572)
+  ROUGE-1: Base + RAG (0.5404)
+  ROUGE-L: Base + RAG (0.4401)
+  Semantic Similarity: Base + RAG (0.8853)
+  Reference Similarity: Base + RAG (0.8853)
+
+OVERALL RANKING:
+  1. Base + RAG: 0.6706 <-- BEST
+  2. Fine-tuned (LoRA): 0.5270
+  3. Base Model: 0.5154
+======================================================================

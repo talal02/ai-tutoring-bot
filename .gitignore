@@ -3,4 +3,3 @@ cache
 examples
 data/conversations
 data/vector_store
-models/finetuned

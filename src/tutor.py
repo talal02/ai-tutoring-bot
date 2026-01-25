@@ -59,7 +59,7 @@ class HistoryTutor:
         self.retriever = None
         self.dialogue_manager = DialogueManager()
 
-        self.logger.info("system initialized")
+        self.logger.info("System Initialized")
 
     def setup_llm(self, adapter_path: Optional[str] = None) -> None:
         """Setup LLM layer with optional LoRA adapter."""
@@ -129,14 +129,18 @@ class HistoryTutor:
         else:
             self.logger.warning("No documents loaded for RAG system")
 
-    def chat(self, message: str) -> str:
+    def chat(self, message: str, use_rag: bool = True) -> str:
         """
         Main chat interface demonstrating all three layers.
 
         Flow:
         1. Dialogue layer detects intent
-        2. RAG layer retrieves relevant context
+        2. RAG layer retrieves relevant context (if enabled)
         3. LLM layer generates response
+
+        Args:
+            message: User message
+            use_rag: Whether to use RAG for context retrieval
         """
         self.logger.info(f"\n{'='*70}\nUser: {message}\n{'='*70}")
 
@@ -157,12 +161,14 @@ class HistoryTutor:
         elif intent == Intent.THANKS:
             response = "You're welcome! What else would you like to learn about?"
         else:
-            # RAG layer: Retrieve relevant context
+            # RAG layer: Retrieve relevant context (if enabled and available)
             context = None
-            if strategy.get('use_rag') and self.retriever:
+            if use_rag and strategy.get('use_rag') and self.retriever:
                 results = self.retriever.retrieve(message, top_k=5)
                 context = self.retriever.format_retrieved_context(results)
                 self.logger.info(f"Retrieved {len(results)} context documents")
+            elif use_rag and not self.retriever:
+                self.logger.warning("RAG requested but retriever not initialized")
 
             # LLM layer: Generate response
             if self.generator:
@@ -261,14 +267,28 @@ def main():
         "--dataset",
         type=str,
         default="../questions_dataset.json",
-        help="Path to dataset file",
+        help="Path to JSON Q&A dataset file",
+    )
+    parser.add_argument(
+        "--use-rag",
+        action="store_true",
+        default=True,
+        help="Enable RAG for context retrieval (default: True)",
+    )
+    parser.add_argument(
+        "--no-rag",
+        action="store_true",
+        help="Disable RAG and use LLM only",
     )
     parser.add_argument(
         "--rebuild-index",
         action="store_true",
-        help="Rebuild RAG index",
+        help="Rebuild RAG index from scratch",
     )
     args = parser.parse_args()
+
+    # Handle RAG enable/disable logic
+    use_rag_mode = args.use_rag and not args.no_rag
 
     print("\nInitializing...\n")
 
@@ -277,8 +297,17 @@ def main():
     print("Loading language model...")
     tutor.setup_llm()
 
-    print("\nSetting up RAG system...")
-    tutor.setup_rag(dataset_path=args.dataset, rebuild_index=args.rebuild_index, pdf_directory="./data")
+    # Setup RAG only if enabled
+    if use_rag_mode:
+        print("\nSetting up RAG system...")
+        print(f"  - Loading JSON dataset: {args.dataset}")
+        tutor.setup_rag(
+            dataset_path=args.dataset,
+            rebuild_index=args.rebuild_index,
+            pdf_directory="./data"
+        )
+    else:
+        print("\nRAG disabled - using LLM only mode")
 
     print("\n" + "="*70)
     print("SYSTEM READY")
@@ -290,6 +319,8 @@ def main():
         print(f"  {key}: {value}")
 
     print("\n" + "="*70)
+    print("MODE: " + ("RAG + LLM" if use_rag_mode else "LLM Only"))
+    print("="*70)
     print("COMMANDS:")
     print("  - Ask any history question")
     print("  - Type 'reset' to start fresh")
@@ -305,7 +336,7 @@ def main():
                 continue
 
             if message.lower() == 'quit':
-                response = tutor.chat("goodbye")
+                response = tutor.chat("goodbye", use_rag=use_rag_mode)
                 print(f"\nTutor: {response}")
                 break
 
@@ -321,7 +352,7 @@ def main():
                     print(f"  {key}: {value}")
                 continue
 
-            response = tutor.chat(message)
+            response = tutor.chat(message, use_rag=use_rag_mode)
             print(f"\nTutor: {response}")
 
         except KeyboardInterrupt:
