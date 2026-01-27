@@ -10,7 +10,7 @@ faiss-cpu==1.7.4  # Pinned for CentOS 7 compatibility
 pypdf>=3.0.0
 
 # Quantization (for 4-bit/8-bit models)
-bitsandbytes>=0.43.2
+bitsandbytes>=0.42.0
 
 # Utilities - COMPATIBLE VERSIONS FOR CENTOS 7
 numpy>=1.24.0,<2.0.0
@@ -37,9 +37,11 @@ pathspec>=0.9.0
 platformdirs>=2.0.0
 tomli>=1.1.0
 
-# Optional: Web interface
-flask>=3.0.0
-flask-cors>=4.0.0
+# Web interface - FastAPI
+fastapi>=0.104.0
+uvicorn[standard]>=0.24.0
+python-multipart>=0.0.6
+aiofiles>=23.2.0
 
 # Optional: Development and testing
 pytest>=7.4.0

@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI History Tutor</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <h1>AI History Tutor</h1>
+            <div class="header-actions">
+                <button id="stats-btn" class="btn btn-secondary" title="View Statistics">
+                    Stats
+                </button>
+                <button id="reset-btn" class="btn btn-secondary" title="Reset Session">
+                    Reset
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Left Panel: Model Selection & Document Upload -->
+            <aside class="sidebar">
+                <!-- Model Selection -->
+                <section class="card model-selector">
+                    <h2>Model Selection</h2>
+                    <div class="model-options">
+                        <label class="model-option">
+                            <input type="radio" name="model-type" value="base" checked>
+                            <div class="option-content">
+                                <strong>Base Model</strong>
+                                <p>LLM without RAG - uses only training data</p>
+                            </div>
+                        </label>
+
+                        <label class="model-option">
+                            <input type="radio" name="model-type" value="base_rag">
+                            <div class="option-content">
+                                <strong>Base + RAG</strong>
+                                <p>LLM with document retrieval</p>
+                            </div>
+                        </label>
+
+                        <label class="model-option">
+                            <input type="radio" name="model-type" value="finetuned">
+                            <div class="option-content">
+                                <strong>Fine-tuned + RAG</strong>
+                                <p>Specialized model with RAG</p>
+                            </div>
+                        </label>
+                    </div>
+
+                    <button id="model-switch-btn" class="btn btn-primary">
+                        Switch Model
+                    </button>
+
+                    <div id="model-info" class="model-info">
+                        <strong>Current:</strong> Loading...
+                    </div>
+                </section>
+
+                <!-- Document Upload -->
+                <section class="card upload-widget">
+                    <h2>Upload Documents</h2>
+                    <p class="upload-description">
+                        Add PDF or TXT files to enhance RAG context
+                    </p>
+
+                    <div class="upload-controls">
+                        <input type="file" id="file-input" multiple accept=".pdf,.txt" class="file-input">
+                        <label for="file-input" class="btn btn-secondary btn-file">
+                            Choose Files
+                        </label>
+                        <button id="upload-btn" class="btn btn-primary">
+                            Upload
+                        </button>
+                    </div>
+
+                    <div id="selected-files" class="selected-files"></div>
+
+                    <div id="uploaded-files-list" class="uploaded-files">
+                        <h3>Uploaded Files</h3>
+                        <div id="uploaded-files-content">
+                            <p class="no-files">No files uploaded yet</p>
+                        </div>
+                    </div>
+                </section>
+            </aside>
+
+            <!-- Right Panel: Chat Interface -->
+            <section class="chat-container">
+                <!-- Chat History -->
+                <div id="chat-history" class="chat-history">
+                    <div class="message message-system">
+                        <div class="message-content">
+                            Welcome to the AI History Tutor! Select a model and start chatting.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Chat Input -->
+                <div class="chat-input-container">
+                    <textarea
+                        id="message-input"
+                        class="chat-input"
+                        placeholder="Ask a history question..."
+                        rows="3"
+                    ></textarea>
+                    <button id="send-btn" class="btn btn-primary btn-send">
+                        Send
+                    </button>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Stats Modal -->
+    <div id="stats-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Session Statistics</h2>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body" id="stats-content">
+                Loading...
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="loading-overlay">
+        <div class="loading-spinner"></div>
+        <p id="loading-message">Loading...</p>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="/static/script.js"></script>
+</body>
+</html>
