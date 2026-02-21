@@ -1,0 +1,93 @@
+================================================================================
+HALLUCINATION DETECTION REPORT
+================================================================================
+
+NLI Model: microsoft/deberta-large-mnli
+Analysis Method: Hybrid NLI + Semantic Similarity
+  - NLI confidence threshold: 0.3 (lowered for better coverage)
+  - Semantic fallback enabled (sim > 0.7 → entailed)
+
+RESULTS BY MODEL:
+--------------------------------------------------------------------------------
+
+Base Model (No RAG)
+----------------------------------------
+  Total Responses Analyzed: 50
+  Total Sentences: 213
+
+  Sentence Classification:
+    Entailed (Grounded):       97 (45.5%)
+    Contradicted:               4 (1.9%)
+    Neutral (Unverifiable):   112 (52.6%)
+
+  Average Rates:
+    Hallucination Rate: 1.2% (±4.4%)
+    Grounding Rate:     45.3% (±32.5%)
+    Comparison source:  Reference answers (verified correct answers)
+
+Base Model + RAG
+----------------------------------------
+  Total Responses Analyzed: 50
+  Total Sentences: 268
+
+  Sentence Classification:
+    Entailed (Grounded):      128 (47.8%)
+    Contradicted:               1 (0.4%)
+    Neutral (Unverifiable):   139 (51.9%)
+
+  Average Rates:
+    Hallucination Rate: 0.2% (±1.7%)
+    Grounding Rate:     45.8% (±35.0%)
+    Comparison source:  Reference answers (verified correct answers)
+
+Fine-tuned (LoRA) + RAG
+----------------------------------------
+  Total Responses Analyzed: 50
+  Total Sentences: 309
+
+  Sentence Classification:
+    Entailed (Grounded):      148 (47.9%)
+    Contradicted:               4 (1.3%)
+    Neutral (Unverifiable):   157 (50.8%)
+
+  Average Rates:
+    Hallucination Rate: 1.1% (±3.8%)
+    Grounding Rate:     43.7% (±30.2%)
+    Comparison source:  Reference answers (verified correct answers)
+
+
+================================================================================
+COMPARATIVE ANALYSIS
+================================================================================
+
+Hallucination Rates (lower is better):
+  Base Model:                         1.2%
+  Base + RAG:                         0.2%
+  Fine-tuned + RAG:                   1.1%
+
+  RAG reduces base hallucination by:     78.9%
+  Fine-tuning reduces further by:        -334.6%
+
+Grounding Rates (higher is better):
+  Base Model:                         45.3%
+  Base + RAG:                         45.8%
+  Fine-tuned + RAG:                   43.7%
+
+  RAG increases grounding by:            +0.4 pp
+  Fine-tuning increases further by:      +-2.1 pp
+
+INTERPRETATION:
+--------------------------------------------------------------------------------
+Hallucination Rate = % of sentences that CONTRADICT the comparison source
+Grounding Rate = % of sentences ENTAILED (supported) by comparison source
+Neutral = Unverifiable from comparison source
+
+COMPARISON SOURCES:
+  ALL Models:        Compared against REFERENCE ANSWERS (verified correct answers)
+                     Shows how often each model contradicts known facts
+
+This allows consistent comparison:
+  - All models measured against the same ground truth (reference answers)
+  - Hallucination = deviating from correct, verified answers
+  - Grounding = agreement with verified correct answers
+================================================================================

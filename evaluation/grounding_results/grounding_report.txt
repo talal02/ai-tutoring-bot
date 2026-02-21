@@ -1,0 +1,81 @@
+================================================================================
+SOURCE GROUNDING ANALYSIS REPORT
+================================================================================
+
+Similarity Model: sentence-transformers/all-MiniLM-L6-v2
+Grounding Threshold: 0.4
+Method: Semantic similarity between answer sentences and retrieved sources
+
+RESULTS BY MODEL:
+--------------------------------------------------------------------------------
+
+Base Model (No RAG)
+----------------------------------------
+  Total Responses: 50
+  Responses with RAG Sources: 0
+  Total Sentences Analyzed: 211
+
+  Grounding Statistics:
+    Grounded Sentences:      0 (0.0%)
+    Ungrounded Sentences:  211 (100.0%)
+
+  Average Metrics:
+    Grounding Rate:     0.0% (±0.0%)
+    Semantic Similarity: 0.000 (±0.000)
+    Source Coverage:     0.0%
+
+Base Model + RAG
+----------------------------------------
+  Total Responses: 50
+  Responses with RAG Sources: 50
+  Total Sentences Analyzed: 266
+
+  Grounding Statistics:
+    Grounded Sentences:    219 (82.3%)
+    Ungrounded Sentences:   47 (17.7%)
+
+  Average Metrics:
+    Grounding Rate:     73.7% (±33.7%)
+    Semantic Similarity: 0.594 (±0.162)
+    Source Coverage:     50.7%
+
+Fine-tuned (LoRA) + RAG
+----------------------------------------
+  Total Responses: 50
+  Responses with RAG Sources: 50
+  Total Sentences Analyzed: 308
+
+  Grounding Statistics:
+    Grounded Sentences:    239 (77.6%)
+    Ungrounded Sentences:   69 (22.4%)
+
+  Average Metrics:
+    Grounding Rate:     71.4% (±30.8%)
+    Semantic Similarity: 0.535 (±0.124)
+    Source Coverage:     63.3%
+
+
+================================================================================
+COMPARATIVE ANALYSIS
+================================================================================
+
+RAG Impact on Grounding:
+  Base Model Grounding:     0.0%
+  RAG Model Grounding:      82.3%
+  Improvement:              +82.3 percentage points
+
+Average Similarity Scores:
+  Base Model:  0.000
+  RAG Model:   0.594
+  Improvement: +0.594
+
+================================================================================
+
+INTERPRETATION:
+--------------------------------------------------------------------------------
+Grounding rate measures the % of answer sentences that have semantic
+similarity ≥ 0.4 with retrieved curriculum sources.
+
+High grounding rate indicates answers are based on curriculum content
+rather than model's parametric knowledge (potential hallucinations).
+================================================================================

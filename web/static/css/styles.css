@@ -323,6 +323,35 @@ body {
     font-size: 0.8rem;
 }
 
+.message-content h1,
+.message-content h2,
+.message-content h3 {
+    margin: 0.5em 0;
+}
+
+.message-content p {
+    margin: 0.4em 0;
+}
+
+.message-content ul,
+.message-content ol {
+    margin: 0.4em 0 0.4em 1.2em;
+}
+
+.message-content code {
+    background: rgba(0,0,0,0.08);
+    padding: 2px 4px;
+    border-radius: 4px;
+    font-family: monospace;
+}
+
+.message-content pre {
+    background: rgba(0,0,0,0.08);
+    padding: 10px;
+    border-radius: 6px;
+    overflow-x: auto;
+}
+
 /* ===========================
    Chat Input
    =========================== */

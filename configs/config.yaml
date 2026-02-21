@@ -2,11 +2,11 @@
 
 # LLM Configuration
 llm:
-  model_name: "meta-llama/Llama-3.2-3B-Instruct"
+  model_name: "meta-llama/Meta-Llama-3.1-8B-Instruct"
 
   # Generation parameters
   generation:
-    max_new_tokens: 1024
+    max_new_tokens: 4096
     temperature: 0.7
     top_p: 0.9
     top_k: 50
@@ -15,8 +15,8 @@ llm:
 
   # Device configuration
   device: "cuda"  # "cuda", "cpu"
-  load_in_4bit: false  # Enable for QLoRA/memory savings
-  load_in_8bit: false
+  load_in_4bit: false
+  load_in_8bit: false  # bitsandbytes 0.43.2+ required; not available on CentOS 7
 
   # Cache settings
   use_cache: true
@@ -82,3 +82,32 @@ app:
   save_conversations: true
   conversation_dir: "./data/conversations"
   max_conversation_history: 10
+
+# Assessment Configuration
+assessment:
+  # Enable assessment features
+  enabled: true
+
+  # Hint settings
+  hints:
+    max_hints_per_question: 3
+    default_level: "partial"
+    levels:
+      - nudge    # Subtle guidance
+      - partial  # More direct
+      - full     # Nearly complete answer
+
+  # Error detection
+  error_analysis:
+    enabled: true
+    check_for:
+      - presentism          # Judging past by present standards
+      - anachronism         # Wrong time period
+      - oversimplification  # Ignoring complexity
+      - lack_of_evidence    # No supporting evidence
+      - false_causation     # Incorrect cause-effect
+
+  # Socratic questioning
+  socratic:
+    enabled: true
+    min_question_length: 10  # Minimum words for thoughtful questions

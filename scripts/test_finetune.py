@@ -4,7 +4,7 @@ from peft import PeftModel
 import json
 
 
-def load_base_model(model_name: str = "meta-llama/Llama-3.2-3B-Instruct"):
+def load_base_model(model_name: str = "meta-llama/Llama-3.1-8B-Instruct"):
     print("Loading base model...")
     tokenizer = AutoTokenizer.from_pretrained(model_name, trust_remote_code=True)
     model = AutoModelForCausalLM.from_pretrained(
@@ -18,7 +18,7 @@ def load_base_model(model_name: str = "meta-llama/Llama-3.2-3B-Instruct"):
 
 
 def load_finetuned_model(
-    base_model_name: str = "meta-llama/Llama-3.2-3B-Instruct",
+    base_model_name: str = "meta-llama/Llama-3.1-8B-Instruct",
     adapter_path: str = "models/finetuned/final"
 ):
     print("Loading fine-tuned model...")

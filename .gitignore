@@ -3,3 +3,6 @@ cache
 examples
 data/conversations
 data/vector_store
+data/*.pdf
+models/
+logs/

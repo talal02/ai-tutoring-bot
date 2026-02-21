@@ -1,0 +1,41 @@
+{
+  "base": {
+    "total_responses": 50,
+    "responses_with_sources": 0,
+    "total_sentences": 211,
+    "grounded_sentences": 0,
+    "ungrounded_sentences": 211,
+    "avg_grounding_rate": 0.0,
+    "std_grounding_rate": 0.0,
+    "avg_similarity": 0.0,
+    "std_similarity": 0.0,
+    "avg_source_coverage": 0.0,
+    "overall_grounding_pct": 0.0
+  },
+  "base_rag": {
+    "total_responses": 50,
+    "responses_with_sources": 50,
+    "total_sentences": 266,
+    "grounded_sentences": 219,
+    "ungrounded_sentences": 47,
+    "avg_grounding_rate": 0.7365476190476191,
+    "std_grounding_rate": 0.33716339139107476,
+    "avg_similarity": 0.5937156575400924,
+    "std_similarity": 0.16232147226449828,
+    "avg_source_coverage": 0.5066666666666666,
+    "overall_grounding_pct": 82.33082706766918
+  },
+  "finetuned": {
+    "total_responses": 50,
+    "responses_with_sources": 50,
+    "total_sentences": 308,
+    "grounded_sentences": 239,
+    "ungrounded_sentences": 69,
+    "avg_grounding_rate": 0.7138708513708515,
+    "std_grounding_rate": 0.3080105735752863,
+    "avg_similarity": 0.535134540808246,
+    "std_similarity": 0.1235637142088284,
+    "avg_source_coverage": 0.6333333333333333,
+    "overall_grounding_pct": 77.59740259740259
+  }
+}

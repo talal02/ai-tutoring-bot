@@ -1,244 +1,119 @@
-"""
-Configuration management for the Large Tutoring Models system.
-Handles loading and validation of configuration from YAML files.
-"""
-
-import os
-from pathlib import Path
-from typing import Any, Dict, Optional
+import copy
 import yaml
-from dataclasses import dataclass, field
+from pathlib import Path
+from types import SimpleNamespace
+
+_config = None
+
+_DEFAULTS = {
+    'llm': {
+        'model_name': 'microsoft/Phi-3-mini-4k-instruct',
+        'device': 'cuda',
+        'load_in_4bit': False,
+        'load_in_8bit': False,
+        'use_cache': True,
+        'cache_dir': './cache/models',
+        'generation': {
+            'max_new_tokens': 512,
+            'temperature': 0.7,
+            'top_p': 0.9,
+            'top_k': 50,
+            'repetition_penalty': 1.1,
+            'do_sample': True,
+        },
+    },
+    'rag': {
+        'embedding_model': 'sentence-transformers/all-MiniLM-L6-v2',
+        'chunking': {'chunk_size': 512, 'chunk_overlap': 50, 'separator': '\n\n'},
+        'retrieval': {'top_k': 5, 'similarity_threshold': 0.3},
+        'vector_store': {
+            'type': 'faiss',
+            'index_type': 'IndexFlatL2',
+            'persist_directory': './data/vector_store',
+        },
+        'embedding_cache': {'enabled': True, 'cache_dir': './cache/embeddings'},
+    },
+    'prompts': {
+        'system_prompt': (
+            "You are a knowledgeable and patient history tutor for high school students. "
+            "Your goal is to help students understand historical concepts through clear explanations, "
+            "Socratic questioning, and step-by-step guidance. Always ground your responses in "
+            "curriculum materials and avoid speculation."
+        ),
+        'rag_prompt_template': (
+            "Context from curriculum materials:\n{context}\n\n"
+            "Student question: {question}\n\n"
+            "Based on the context provided, give a clear and pedagogically sound answer. "
+            "If the context doesn't contain enough information, acknowledge this limitation."
+        ),
+        'hint_prompt_template': (
+            "The student is working on: {question}\n"
+            "Their current understanding: {student_response}\n\n"
+            "Provide a {hint_level} hint to guide them toward the correct answer without giving it away directly.\n"
+            "Hint levels: nudge (very subtle), partial (more direct), full (nearly complete answer)"
+        ),
+    },
+    'logging': {
+        'level': 'INFO',
+        'log_file': './logs/tutor.log',
+        'console_output': True,
+    },
+    'app': {
+        'save_conversations': True,
+        'conversation_dir': './data/conversations',
+        'max_conversation_history': 10,
+    },
+}
 
 
-@dataclass
-class LLMConfig:
-    """LLM-specific configuration."""
-    model_name: str = "microsoft/Phi-3-mini-4k-instruct"
-    device: str = "cuda"
-    load_in_4bit: bool = False
-    load_in_8bit: bool = False
-    use_cache: bool = True
-    cache_dir: str = "./cache/models"
-    generation: Dict[str, Any] = field(default_factory=lambda: {
-        "max_new_tokens": 512,
-        "temperature": 0.7,
-        "top_p": 0.9,
-        "top_k": 50,
-        "repetition_penalty": 1.1,
-        "do_sample": True,
-    })
+def _deep_merge(base: dict, override: dict) -> None:
+    for k, v in override.items():
+        if k in base and isinstance(base[k], dict) and isinstance(v, dict):
+            base[k].update(v)
+        else:
+            base[k] = v
 
 
-@dataclass
-class RAGConfig:
-    """RAG-specific configuration."""
-    embedding_model: str = "sentence-transformers/all-MiniLM-L6-v2"
-    chunking: Dict[str, Any] = field(default_factory=lambda: {
-        "chunk_size": 512,
-        "chunk_overlap": 50,
-        "separator": "\n\n",
-    })
-    retrieval: Dict[str, Any] = field(default_factory=lambda: {
-        "top_k": 5,
-        "similarity_threshold": 0.3,
-    })
-    vector_store: Dict[str, Any] = field(default_factory=lambda: {
-        "type": "faiss",
-        "index_type": "IndexFlatL2",
-        "persist_directory": "./data/vector_store",
-    })
-    embedding_cache: Dict[str, Any] = field(default_factory=lambda: {
-        "enabled": True,
-        "cache_dir": "./cache/embeddings",
-    })
+def get_config(config_path=None):
+    global _config
+    if _config is None:
+        data = copy.deepcopy(_DEFAULTS)
+        if config_path and Path(config_path).exists():
+            with open(config_path, 'r', encoding='utf-8') as f:
+                overrides = yaml.safe_load(f) or {}
+            for section, vals in overrides.items():
+                if section in data and isinstance(vals, dict):
+                    _deep_merge(data[section], vals)
+        _config = SimpleNamespace(**{k: SimpleNamespace(**v) for k, v in data.items()})
+        _ensure_dirs(_config)
+    return _config
 
 
-@dataclass
-class PromptsConfig:
-    """Prompts configuration."""
-    system_prompt: str = (
-        "You are a knowledgeable and patient history tutor for high school students. "
-        "Your goal is to help students understand historical concepts through clear explanations, "
-        "Socratic questioning, and step-by-step guidance. Always ground your responses in "
-        "curriculum materials and avoid speculation."
-    )
-    rag_prompt_template: str = (
-        "Context from curriculum materials:\n{context}\n\n"
-        "Student question: {question}\n\n"
-        "Based on the context provided, give a clear and pedagogically sound answer. "
-        "If the context doesn't contain enough information, acknowledge this limitation."
-    )
-    hint_prompt_template: str = (
-        "The student is working on: {question}\n"
-        "Their current understanding: {student_response}\n\n"
-        "Provide a {hint_level} hint to guide them toward the correct answer without giving it away directly.\n"
-        "Hint levels: nudge (very subtle), partial (more direct), full (nearly complete answer)"
-    )
+def reload_config(config_path: str):
+    global _config
+    _config = None
+    return get_config(config_path)
 
 
-@dataclass
-class LoggingConfig:
-    """Logging configuration."""
-    level: str = "INFO"
-    log_file: str = "./logs/tutor.log"
-    console_output: bool = True
+def _ensure_dirs(cfg) -> None:
+    for d in [
+        cfg.llm.cache_dir,
+        cfg.rag.vector_store['persist_directory'],
+        cfg.rag.embedding_cache['cache_dir'],
+        cfg.app.conversation_dir,
+        str(Path(cfg.logging.log_file).parent),
+    ]:
+        Path(d).mkdir(parents=True, exist_ok=True)
 
 
-@dataclass
-class AppConfig:
-    """Application-wide configuration."""
-    save_conversations: bool = True
-    conversation_dir: str = "./data/conversations"
-    max_conversation_history: int = 10
+# Backward-compatible type aliases used as type hints in other modules
+LLMConfig = SimpleNamespace
+RAGConfig = SimpleNamespace
+PromptsConfig = SimpleNamespace
+LoggingConfig = SimpleNamespace
+AppConfig = SimpleNamespace
 
 
 class Config:
-    """Main configuration class that aggregates all sub-configurations."""
-
-    def __init__(self, config_path: Optional[str] = None):
-        """
-        Initialize configuration from YAML file.
-
-        Args:
-            config_path: Path to YAML config file. If None, uses default config.
-        """
-        self.llm = LLMConfig()
-        self.rag = RAGConfig()
-        self.prompts = PromptsConfig()
-        self.logging = LoggingConfig()
-        self.app = AppConfig()
-
-        if config_path:
-            self.load_from_yaml(config_path)
-
-    def load_from_yaml(self, config_path: str) -> None:
-        """
-        Load configuration from YAML file.
-
-        Args:
-            config_path: Path to YAML configuration file.
-
-        Raises:
-            FileNotFoundError: If config file doesn't exist.
-            yaml.YAMLError: If YAML is malformed.
-        """
-        config_file = Path(config_path)
-        if not config_file.exists():
-            raise FileNotFoundError(f"Configuration file not found: {config_path}")
-
-        with open(config_file, 'r', encoding='utf-8') as f:
-            config_dict = yaml.safe_load(f)
-
-        # Update LLM config
-        if 'llm' in config_dict:
-            self._update_dataclass(self.llm, config_dict['llm'])
-
-        # Update RAG config
-        if 'rag' in config_dict:
-            self._update_dataclass(self.rag, config_dict['rag'])
-
-        # Update prompts config
-        if 'prompts' in config_dict:
-            self._update_dataclass(self.prompts, config_dict['prompts'])
-
-        # Update logging config
-        if 'logging' in config_dict:
-            self._update_dataclass(self.logging, config_dict['logging'])
-
-        # Update app config
-        if 'app' in config_dict:
-            self._update_dataclass(self.app, config_dict['app'])
-
-    @staticmethod
-    def _update_dataclass(obj: Any, updates: Dict[str, Any]) -> None:
-        """
-        Update dataclass fields from dictionary.
-
-        Args:
-            obj: Dataclass instance to update.
-            updates: Dictionary with updates.
-        """
-        for key, value in updates.items():
-            if hasattr(obj, key):
-                current_value = getattr(obj, key)
-                # If current value is a dict, update it
-                if isinstance(current_value, dict) and isinstance(value, dict):
-                    current_value.update(value)
-                else:
-                    setattr(obj, key, value)
-
-    def save_to_yaml(self, config_path: str) -> None:
-        """
-        Save current configuration to YAML file.
-
-        Args:
-            config_path: Path where to save configuration.
-        """
-        config_dict = {
-            'llm': self._dataclass_to_dict(self.llm),
-            'rag': self._dataclass_to_dict(self.rag),
-            'prompts': self._dataclass_to_dict(self.prompts),
-            'logging': self._dataclass_to_dict(self.logging),
-            'app': self._dataclass_to_dict(self.app),
-        }
-
-        config_file = Path(config_path)
-        config_file.parent.mkdir(parents=True, exist_ok=True)
-
-        with open(config_file, 'w', encoding='utf-8') as f:
-            yaml.dump(config_dict, f, default_flow_style=False, sort_keys=False)
-
-    @staticmethod
-    def _dataclass_to_dict(obj: Any) -> Dict[str, Any]:
-        """Convert dataclass to dictionary."""
-        return {k: v for k, v in obj.__dict__.items()}
-
-    def ensure_directories(self) -> None:
-        """Create necessary directories if they don't exist."""
-        directories = [
-            self.llm.cache_dir,
-            self.rag.vector_store['persist_directory'],
-            self.rag.embedding_cache['cache_dir'],
-            self.app.conversation_dir,
-            os.path.dirname(self.logging.log_file),
-        ]
-
-        for directory in directories:
-            Path(directory).mkdir(parents=True, exist_ok=True)
-
-
-# Global configuration instance
-_config: Optional[Config] = None
-
-
-def get_config(config_path: Optional[str] = None) -> Config:
-    """
-    Get global configuration instance (singleton pattern).
-
-    Args:
-        config_path: Path to config file. Only used on first call.
-
-    Returns:
-        Config instance.
-    """
-    global _config
-    if _config is None:
-        _config = Config(config_path)
-        _config.ensure_directories()
-    return _config
-
-
-def reload_config(config_path: str) -> Config:
-    """
-    Reload configuration from file.
-
-    Args:
-        config_path: Path to config file.
-
-    Returns:
-        New Config instance.
-    """
-    global _config
-    _config = Config(config_path)
-    _config.ensure_directories()
-    return _config
+    """Backward-compatible stub — use get_config() instead."""
+    pass

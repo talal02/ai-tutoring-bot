@@ -13,7 +13,6 @@ import time
 sys.path.append(str(Path(__file__).parent.parent / "src"))
 from src.tutor import HistoryTutor
 
-# Request models
 class ChatRequest(BaseModel):
     message: str
     use_rag: Optional[bool] = None
@@ -22,13 +21,11 @@ class ModelSwitchRequest(BaseModel):
     model_type: str
     adapter_path: Optional[str] = None
 
-# Global state
 tutor = None
 current_model = "base"
 rag_enabled = False
 upload_dir = Path("./data/uploads")
 
-# Lifespan handler for startup/shutdown
 @asynccontextmanager
 async def lifespan(_):
     global tutor, upload_dir
@@ -59,26 +56,25 @@ async def lifespan(_):
 app = FastAPI(title="AI Tutor", lifespan=lifespan)
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
 
-# === CHAT ===
 @app.post("/api/chat/message")
 async def chat(request: ChatRequest):
     try:
         use_rag = request.use_rag if request.use_rag is not None else rag_enabled
         response_text = tutor.chat(request.message, use_rag=use_rag)
 
-        sources = []
-        if use_rag and tutor.retriever:
-            try:
-                results = tutor.retriever.retrieve(request.message, top_k=5)
-                sources = [{"text": doc.text[:200], "score": score, "metadata": doc.metadata}
-                          for doc, score in results]
-            except:
-                pass
+        detected_intent = tutor.last_intent.value if tutor.last_intent else "unknown"
+        detected_confidence = tutor.last_confidence
+
+        # Use sources already retrieved during chat() — no second retrieval needed
+        sources = [
+            {"text": doc.text[:200], "score": score, "metadata": doc.metadata}
+            for doc, score in tutor.last_sources
+        ]
 
         return {
             "response": response_text,
-            "intent": "unknown",
-            "confidence": 0.0,
+            "intent": detected_intent,
+            "confidence": detected_confidence,
             "sources": sources,
             "model_info": {"type": current_model, "rag_enabled": use_rag}
         }
@@ -90,13 +86,12 @@ async def clear_history():
     tutor.reset()
     return {"success": True, "message": "History cleared"}
 
-# === MODELS ===
 @app.get("/api/models/current")
 async def get_current_model():
     return {
         "model_type": current_model,
         "rag_enabled": rag_enabled,
-        "model_name": "meta-llama/Llama-3.2-3B-Instruct",
+        "model_name": "meta-llama/Llama-3.1-8B-Instruct",
         "adapter_path": None,
         "memory_usage": None
     }
@@ -108,7 +103,6 @@ async def switch_model(request: ModelSwitchRequest):
         start = time.time()
         model_type = request.model_type
 
-        # Load appropriate model configuration
         if model_type == "base":
             tutor.setup_llm()
             rag_enabled = False
@@ -125,7 +119,7 @@ async def switch_model(request: ModelSwitchRequest):
             rag_enabled = True
 
         elif model_type == "finetuned":
-            adapter_path = request.adapter_path or "./models/finetuned/final"
+            adapter_path = request.adapter_path or "./models/finetuned_8b/final"
             tutor.setup_llm(adapter_path=adapter_path)
             if not tutor.retriever:
                 tutor.setup_rag(
@@ -149,7 +143,6 @@ async def switch_model(request: ModelSwitchRequest):
     except Exception as e:
         raise HTTPException(500, str(e))
 
-# === DOCUMENTS ===
 @app.post("/api/documents/upload")
 async def upload_documents(files: List[UploadFile] = File(...)):
     try:
@@ -163,7 +156,6 @@ async def upload_documents(files: List[UploadFile] = File(...)):
             with open(file_path, "wb") as f:
                 f.write(content)
 
-            # Load document based on file type
             if ".gitkeep" in file.filename:
                 continue
 
@@ -172,10 +164,7 @@ async def upload_documents(files: List[UploadFile] = File(...)):
             else:
                 doc = tutor.doc_processor.load_text_file(str(file_path))
 
-            # Process and chunk the document
             chunks = tutor.doc_processor.process_documents([doc], chunk=True)
-
-            # Add chunks to retriever
             tutor.retriever.add_documents(chunks)
 
             uploaded_files.append({
@@ -215,7 +204,6 @@ async def list_documents():
                 })
     return {"documents": documents, "total_files": len(documents), "total_chunks": 0}
 
-# === SESSION ===
 @app.post("/api/session/reset")
 async def reset_session():
     tutor.reset()
@@ -238,7 +226,6 @@ async def health():
 async def api_health():
     return {"status": "ok"}
 
-# Serve frontend
 web_dir = Path(__file__).parent.parent / "web"
 app.mount("/static", StaticFiles(directory=str(web_dir / "static")), name="static")
 

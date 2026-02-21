@@ -1,0 +1,44 @@
+{
+  "base": {
+    "total_responses": 50,
+    "total_sentences": 213,
+    "entailed_sentences": 97,
+    "contradicted_sentences": 4,
+    "neutral_sentences": 112,
+    "avg_hallucination_rate": 0.011857142857142858,
+    "avg_grounding_rate": 0.45341269841269843,
+    "std_hallucination_rate": 0.043790083678515945,
+    "std_grounding_rate": 0.32538072937348184,
+    "overall_entailment_pct": 45.539906103286384,
+    "overall_contradiction_pct": 1.8779342723004695,
+    "overall_neutral_pct": 52.58215962441315
+  },
+  "base_rag": {
+    "total_responses": 50,
+    "total_sentences": 268,
+    "entailed_sentences": 128,
+    "contradicted_sentences": 1,
+    "neutral_sentences": 139,
+    "avg_hallucination_rate": 0.0025,
+    "avg_grounding_rate": 0.4575068820068821,
+    "std_hallucination_rate": 0.017499999999999998,
+    "std_grounding_rate": 0.3501919753929557,
+    "overall_entailment_pct": 47.76119402985074,
+    "overall_contradiction_pct": 0.3731343283582089,
+    "overall_neutral_pct": 51.865671641791046
+  },
+  "finetuned": {
+    "total_responses": 50,
+    "total_sentences": 309,
+    "entailed_sentences": 148,
+    "contradicted_sentences": 4,
+    "neutral_sentences": 157,
+    "avg_hallucination_rate": 0.010865800865800865,
+    "avg_grounding_rate": 0.4367987012987013,
+    "std_hallucination_rate": 0.03767101954966057,
+    "std_grounding_rate": 0.30230216937228066,
+    "overall_entailment_pct": 47.896440129449836,
+    "overall_contradiction_pct": 1.2944983818770228,
+    "overall_neutral_pct": 50.80906148867314
+  }
+}

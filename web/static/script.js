@@ -71,7 +71,20 @@ function addMessage(role, text, sources = []) {
 
     const content = document.createElement('div');
     content.className = 'message-content';
-    content.textContent = text;
+
+    // Convert Markdown → HTML
+    let html = text;
+
+    if (window.marked) {
+        html = marked.parse(text);
+    }
+
+    // Sanitize HTML (important for security)
+    if (window.DOMPurify) {
+        html = DOMPurify.sanitize(html);
+    }
+
+    content.innerHTML = html;
     div.appendChild(content);
 
     if (sources.length > 0) {
@@ -236,19 +249,79 @@ async function showStats() {
         const res = await fetch(`${API}/session/stats`);
         const stats = await res.json();
 
-        const modal = document.getElementById('stats-modal');
+        // API nests dialogue data under dialogue.conversation and dialogue.lesson
+        const conversation = stats.dialogue?.conversation || {};
+        const lesson       = stats.dialogue?.lesson       || {};
+        const mem          = stats.llm_memory             || {};
+        const rag          = stats.rag                    || {};
+        const assess       = stats.assessment             || {};
+
+        // Intent distribution — sorted by count descending
+        const intents = conversation.intent_distribution || {};
+        const intentRows = Object.entries(intents)
+            .sort((a, b) => b[1] - a[1])
+            .map(([k, v]) => `<tr><td>${k}</td><td>${v}</td></tr>`)
+            .join('');
+
+        // Answer accuracy
+        const correct   = lesson.correct_answers   || 0;
+        const incorrect = lesson.incorrect_answers || 0;
+        const total     = correct + incorrect;
+        const accuracy  = total > 0 ? Math.round((correct / total) * 100) + '%' : '—';
+
+        // GPU memory bar (filled ratio of reserved)
+        const allocGb   = mem.allocated_gb   ? mem.allocated_gb.toFixed(1)   : null;
+        const reservedGb= mem.reserved_gb    ? mem.reserved_gb.toFixed(1)    : null;
+        const memLine   = allocGb
+            ? `${allocGb} GB allocated / ${reservedGb} GB reserved`
+            : 'N/A';
+
+        const modal   = document.getElementById('stats-modal');
         const content = document.getElementById('stats-content');
 
         content.innerHTML = `
             <h3>Conversation</h3>
-            <p>Turns: ${stats.dialogue?.total_turns || 0}</p>
+            <table>
+                <tr><td>Turns</td><td>${conversation.total_turns || 0}</td></tr>
+                <tr><td>Duration</td><td>${conversation.session_duration_minutes != null ? conversation.session_duration_minutes.toFixed(1) + ' min' : '—'}</td></tr>
+            </table>
 
-            <h3>Learning</h3>
-            <p>Topic: ${stats.lesson?.topic || 'N/A'}</p>
-            <p>Correct: ${stats.lesson?.correct_answers || 0}</p>
-            <p>Incorrect: ${stats.lesson?.incorrect_answers || 0}</p>
+            ${intentRows ? `
+            <h3>Intent breakdown</h3>
+            <table>
+                <tr><th>Intent</th><th>Count</th></tr>
+                ${intentRows}
+            </table>` : ''}
 
-            ${stats.rag ? `<h3>RAG</h3><p>Documents: ${stats.rag.num_documents}</p>` : ''}
+            <h3>Learning progress</h3>
+            <table>
+                <tr><td>Topic</td><td>${lesson.topic && lesson.topic !== 'general' ? lesson.topic : '—'}</td></tr>
+                <tr><td>Phase</td><td>${lesson.phase || '—'}</td></tr>
+                ${lesson.current_question ? `<tr><td>Active question</td><td style="font-style:italic">${lesson.current_question.substring(0, 80)}${lesson.current_question.length > 80 ? '…' : ''}</td></tr>` : ''}
+                <tr><td>Correct answers</td><td>${correct}</td></tr>
+                <tr><td>Incorrect answers</td><td>${incorrect}</td></tr>
+                <tr><td>Accuracy</td><td>${accuracy}</td></tr>
+                <tr><td>Hints used</td><td>${lesson.hints_used || 0}</td></tr>
+                <tr><td>Attempts</td><td>${lesson.attempts || 0}</td></tr>
+            </table>
+
+            ${rag.num_documents != null ? `
+            <h3>Knowledge base</h3>
+            <table>
+                <tr><td>Documents</td><td>${rag.num_documents}</td></tr>
+                <tr><td>Vectors</td><td>${rag.num_vectors || rag.num_documents}</td></tr>
+                <tr><td>Embedding dim</td><td>${rag.dimension || '—'}</td></tr>
+                <tr><td>Index</td><td>${rag.index_type || '—'}</td></tr>
+            </table>` : ''}
+
+            ${mem.model_loaded != null ? `
+            <h3>Model</h3>
+            <table>
+                <tr><td>Device</td><td>${mem.device || '—'}</td></tr>
+                <tr><td>GPU memory</td><td>${memLine}</td></tr>
+                <tr><td>Error analyzer</td><td>${assess.components_active?.error_analyzer ? 'active' : 'off'}</td></tr>
+                <tr><td>Hint generator</td><td>${assess.components_active?.hint_generator ? 'active' : 'off'}</td></tr>
+            </table>` : ''}
         `;
 
         modal.classList.add('active');
