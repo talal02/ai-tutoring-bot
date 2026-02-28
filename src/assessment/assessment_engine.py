@@ -63,7 +63,10 @@ class AssessmentEngine:
             return self._fallback_socratic_question()
         prompt = self._build_socratic_prompt(question, student_answer, context)
         try:
-            raw = self.llm_generator.generate(prompt=prompt, temperature=0.7, max_new_tokens=60)
+            # Lower temperature for focused output
+            raw = self.llm_generator.generate(prompt=prompt, temperature=0.5, max_new_tokens=30)
+            # Clean hallucinated content before extracting question
+            raw = self._clean_socratic_output(raw)
             # Extract just the question sentence — ignore preamble/formatting the model may produce
             return self._extract_question(raw) or self._fallback_socratic_question()
         except Exception as e:
@@ -80,22 +83,35 @@ class AssessmentEngine:
                                        errors: List[ErrorDiagnosis], context: Optional[str]) -> str:
         error_feedback = self.error_analyzer.provide_feedback(question=question, student_answer=student_answer, errors=errors)
         socratic_q = self.ask_socratic_question(question, student_answer, context)
-        return f"{error_feedback}\n\nThink about this: {socratic_q}\nWould you like a hint to help you improve your answer?"
+        return f"{error_feedback}\n\n{socratic_q}\n\nWould you like a hint?"
 
     def _build_socratic_prompt(self, question: str, student_answer: str, context: Optional[str]) -> str:
         parts = [
-            "You are a Socratic tutor. The student answered a question, but their answer needs improvement.",
+            "You are a concise Socratic tutor.",
             f"\nQuestion: {question}",
-            f"\nStudent's answer: {student_answer}",
+            f"\nStudent's incorrect answer: {student_answer}",
         ]
         if context:
-            parts.append(f"\nCorrect information: {context[:300]}")
+            parts.append(f"\nContext: {context[:200]}")
         parts.append(
-            "\nWrite ONE short question that guides the student to think more deeply. "
-            "Output ONLY the question itself — no introduction, no bullet points, no formatting. "
-            "Do not give the answer."
+            "\nCRITICAL RULES:\n"
+            "- Write EXACTLY ONE short question (under 15 words)\n"
+            "- Output ONLY the question — no preamble, no commentary\n"
+            "- Do NOT give the answer\n"
+            "- Do NOT hallucinate student responses\n"
+            "- Do NOT add 'Student says...' or similar\n\n"
+            "GOOD: 'What role did Prussian leadership play in the 1870s?'\n"
+            "BAD: 'Student's response: ...' or 'Let me help you...'\n\n"
+            "Guiding question:"
         )
         return "\n".join(parts)
+
+    def _clean_socratic_output(self, raw: str) -> str:
+        """Remove hallucinated student responses and meta-commentary from Socratic questions"""
+        raw = re.sub(r"Student'?s? (response|attempt|answer):.*", "", raw, flags=re.IGNORECASE | re.DOTALL)
+        raw = re.sub(r"(Please wait|Is this enough|Let me help|Now that you).*", "", raw, flags=re.IGNORECASE | re.DOTALL)
+        raw = re.sub(r"(Tutor:|Student:|Question:)", "", raw, flags=re.IGNORECASE)
+        return raw.strip()
 
     def _extract_question(self, raw: str) -> str:
         """Pick the shortest '?'-ending line from LLM output, discarding preamble."""

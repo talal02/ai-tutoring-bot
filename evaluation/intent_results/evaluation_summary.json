@@ -1,0 +1,322 @@
+{
+  "test_dataset": "/home/taah5267/ai-tutoring-bot/evaluation/intent_test_dataset.json",
+  "num_test_cases": 200,
+  "v1": {
+    "accuracy": 0.675,
+    "kappa": 0.643933168994796,
+    "classification_report": {
+      "ANSWER_SUBMISSION": {
+        "precision": 0.9,
+        "recall": 0.6923076923076923,
+        "f1-score": 0.7826086956521738,
+        "support": 26.0
+      },
+      "CLARIFICATION": {
+        "precision": 1.0,
+        "recall": 0.3333333333333333,
+        "f1-score": 0.5,
+        "support": 18.0
+      },
+      "CONTINUE": {
+        "precision": 0.5909090909090909,
+        "recall": 0.8125,
+        "f1-score": 0.6842105263157896,
+        "support": 16.0
+      },
+      "EXAMPLE": {
+        "precision": 0.6,
+        "recall": 0.3,
+        "f1-score": 0.4,
+        "support": 10.0
+      },
+      "EXPLANATION": {
+        "precision": 0.8666666666666667,
+        "recall": 0.6842105263157895,
+        "f1-score": 0.7647058823529413,
+        "support": 19.0
+      },
+      "GREETING": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1-score": 1.0,
+        "support": 8.0
+      },
+      "HELP": {
+        "precision": 1.0,
+        "recall": 0.5555555555555556,
+        "f1-score": 0.7142857142857143,
+        "support": 9.0
+      },
+      "NEW_TOPIC": {
+        "precision": 1.0,
+        "recall": 0.6666666666666666,
+        "f1-score": 0.8,
+        "support": 9.0
+      },
+      "QUESTION": {
+        "precision": 0.525,
+        "recall": 0.7777777777777778,
+        "f1-score": 0.6268656716417911,
+        "support": 27.0
+      },
+      "QUIT": {
+        "precision": 1.0,
+        "recall": 0.7,
+        "f1-score": 0.8235294117647058,
+        "support": 10.0
+      },
+      "REPEAT": {
+        "precision": 1.0,
+        "recall": 0.8571428571428571,
+        "f1-score": 0.923076923076923,
+        "support": 7.0
+      },
+      "REQUEST_HINT": {
+        "precision": 0.6666666666666666,
+        "recall": 0.8333333333333334,
+        "f1-score": 0.7407407407407408,
+        "support": 12.0
+      },
+      "THANKS": {
+        "precision": 0.5,
+        "recall": 0.5882352941176471,
+        "f1-score": 0.5405405405405405,
+        "support": 17.0
+      },
+      "UNKNOWN": {
+        "precision": 0.36,
+        "recall": 0.75,
+        "f1-score": 0.48648648648648657,
+        "support": 12.0
+      },
+      "accuracy": 0.675,
+      "macro avg": {
+        "precision": 0.7863744588744588,
+        "recall": 0.6822187883250466,
+        "f1-score": 0.699075042346986,
+        "support": 200.0
+      },
+      "weighted avg": {
+        "precision": 0.7565810606060606,
+        "recall": 0.675,
+        "f1-score": 0.6799564966535815,
+        "support": 200.0
+      }
+    },
+    "num_errors": 65
+  },
+  "v2": {
+    "accuracy": 0.785,
+    "kappa": 0.7642091410084172,
+    "classification_report": {
+      "ANSWER_SUBMISSION": {
+        "precision": 0.92,
+        "recall": 0.8846153846153846,
+        "f1-score": 0.9019607843137256,
+        "support": 26.0
+      },
+      "CLARIFICATION": {
+        "precision": 0.9230769230769231,
+        "recall": 0.6666666666666666,
+        "f1-score": 0.7741935483870968,
+        "support": 18.0
+      },
+      "CONTINUE": {
+        "precision": 0.9090909090909091,
+        "recall": 0.625,
+        "f1-score": 0.7407407407407406,
+        "support": 16.0
+      },
+      "EXAMPLE": {
+        "precision": 0.8571428571428571,
+        "recall": 0.6,
+        "f1-score": 0.7058823529411764,
+        "support": 10.0
+      },
+      "EXPLANATION": {
+        "precision": 0.6521739130434783,
+        "recall": 0.7894736842105263,
+        "f1-score": 0.7142857142857143,
+        "support": 19.0
+      },
+      "GREETING": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1-score": 1.0,
+        "support": 8.0
+      },
+      "HELP": {
+        "precision": 1.0,
+        "recall": 0.5555555555555556,
+        "f1-score": 0.7142857142857143,
+        "support": 9.0
+      },
+      "NEW_TOPIC": {
+        "precision": 1.0,
+        "recall": 0.6666666666666666,
+        "f1-score": 0.8,
+        "support": 9.0
+      },
+      "QUESTION": {
+        "precision": 0.6944444444444444,
+        "recall": 0.9259259259259259,
+        "f1-score": 0.7936507936507936,
+        "support": 27.0
+      },
+      "QUIT": {
+        "precision": 1.0,
+        "recall": 0.6,
+        "f1-score": 0.7499999999999999,
+        "support": 10.0
+      },
+      "REPEAT": {
+        "precision": 0.8571428571428571,
+        "recall": 0.8571428571428571,
+        "f1-score": 0.8571428571428571,
+        "support": 7.0
+      },
+      "REQUEST_HINT": {
+        "precision": 1.0,
+        "recall": 0.75,
+        "f1-score": 0.8571428571428571,
+        "support": 12.0
+      },
+      "THANKS": {
+        "precision": 0.9375,
+        "recall": 0.8823529411764706,
+        "f1-score": 0.9090909090909091,
+        "support": 17.0
+      },
+      "UNKNOWN": {
+        "precision": 0.39285714285714285,
+        "recall": 0.9166666666666666,
+        "f1-score": 0.55,
+        "support": 12.0
+      },
+      "accuracy": 0.785,
+      "macro avg": {
+        "precision": 0.8673877890570437,
+        "recall": 0.7657190249019086,
+        "f1-score": 0.7905983051415417,
+        "support": 200.0
+      },
+      "weighted avg": {
+        "precision": 0.8472267889718976,
+        "recall": 0.785,
+        "f1-score": 0.7938298540660971,
+        "support": 200.0
+      }
+    },
+    "num_errors": 43
+  },
+  "vbasic": {
+    "accuracy": 0.465,
+    "kappa": 0.4134897360703812,
+    "classification_report": {
+      "ANSWER_SUBMISSION": {
+        "precision": 0.7241379310344828,
+        "recall": 0.8076923076923077,
+        "f1-score": 0.7636363636363636,
+        "support": 26.0
+      },
+      "CLARIFICATION": {
+        "precision": 0.8333333333333334,
+        "recall": 0.2777777777777778,
+        "f1-score": 0.4166666666666667,
+        "support": 18.0
+      },
+      "CONTINUE": {
+        "precision": 0.8571428571428571,
+        "recall": 0.375,
+        "f1-score": 0.5217391304347825,
+        "support": 16.0
+      },
+      "EXAMPLE": {
+        "precision": 0.7777777777777778,
+        "recall": 0.7,
+        "f1-score": 0.7368421052631577,
+        "support": 10.0
+      },
+      "EXPLANATION": {
+        "precision": 0.25,
+        "recall": 0.21052631578947367,
+        "f1-score": 0.22857142857142856,
+        "support": 19.0
+      },
+      "GREETING": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1-score": 1.0,
+        "support": 8.0
+      },
+      "HELP": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1-score": 0.0,
+        "support": 9.0
+      },
+      "NEW_TOPIC": {
+        "precision": 1.0,
+        "recall": 0.3333333333333333,
+        "f1-score": 0.5,
+        "support": 9.0
+      },
+      "QUESTION": {
+        "precision": 0.375,
+        "recall": 0.5555555555555556,
+        "f1-score": 0.44776119402985076,
+        "support": 27.0
+      },
+      "QUIT": {
+        "precision": 0.8,
+        "recall": 0.4,
+        "f1-score": 0.5333333333333333,
+        "support": 10.0
+      },
+      "REPEAT": {
+        "precision": 0.8333333333333334,
+        "recall": 0.7142857142857143,
+        "f1-score": 0.7692307692307692,
+        "support": 7.0
+      },
+      "REQUEST_HINT": {
+        "precision": 0.5,
+        "recall": 0.08333333333333333,
+        "f1-score": 0.14285714285714285,
+        "support": 12.0
+      },
+      "THANKS": {
+        "precision": 0.8888888888888888,
+        "recall": 0.47058823529411764,
+        "f1-score": 0.6153846153846153,
+        "support": 17.0
+      },
+      "UNKNOWN": {
+        "precision": 0.10909090909090909,
+        "recall": 0.5,
+        "f1-score": 0.1791044776119403,
+        "support": 12.0
+      },
+      "accuracy": 0.465,
+      "macro avg": {
+        "precision": 0.6391932164715416,
+        "recall": 0.459149469504401,
+        "f1-score": 0.48965194478714646,
+        "support": 200.0
+      },
+      "weighted avg": {
+        "precision": 0.617240925262477,
+        "recall": 0.465,
+        "f1-score": 0.48523114300456405,
+        "support": 200.0
+      }
+    },
+    "num_errors": 107
+  },
+  "improvement": {
+    "accuracy_gain_from_basic_to_v1": 0.21000000000000002,
+    "accuracy_gain_from_basic_to_v2": 0.32,
+    "accuracy_gain_from_v1_to_v2": 0.10999999999999999,
+    "accuracy_gain_percent": 16.29629629629629
+  }
+}

@@ -6,3 +6,5 @@ data/vector_store
 data/*.pdf
 models/
 logs/
+__pycache__/
+*.pyc

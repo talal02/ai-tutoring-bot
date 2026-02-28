@@ -26,8 +26,8 @@ class BenchmarkResult:
 
 
 class ModelBenchmark:
-    def __init__(self, base_model_name: str = "meta-llama/Llama-3.2-3B-Instruct",
-                 adapter_path: str = "models/finetuned/final",
+    def __init__(self, base_model_name: str = "meta-llama/Meta-Llama-3.1-8B-Instruct",
+                 adapter_path: str = "models/finetuned_8b/final",
                  config_path: str = None):
         self.base_model_name = base_model_name
         self.adapter_path = adapter_path
@@ -79,8 +79,8 @@ class ModelBenchmark:
         self.tokenizers['finetuned'] = tokenizer
         print("Fine-tuned model loaded")
 
-    def setup_rag(self):
-        print("\nSetting up RAG system...")
+    def setup_rag(self, use_finetuned=False):
+        print(f"\nSetting up RAG system with {'finetuned' if use_finetuned else 'base'} model...")
         try:
             from utils.config import get_config
             from rag.embedder import Embedder
@@ -107,12 +107,18 @@ class ModelBenchmark:
 
             self.rag_components = {'retriever': retriever, 'embedder': embedder}
 
-            if 'base' not in self.models:
-                self.load_base_model()
-
-            self.models['rag'] = self.models['base']
-            self.tokenizers['rag'] = self.tokenizers['base']
-            print("RAG setup complete")
+            if use_finetuned:
+                if 'finetuned' not in self.models:
+                    self.load_finetuned_model()
+                self.models['finetuned_rag'] = self.models['finetuned']
+                self.tokenizers['finetuned_rag'] = self.tokenizers['finetuned']
+                print("RAG setup complete with finetuned model")
+            else:
+                if 'base' not in self.models:
+                    self.load_base_model()
+                self.models['rag'] = self.models['base']
+                self.tokenizers['rag'] = self.tokenizers['base']
+                print("RAG setup complete with base model")
 
         except Exception as e:
             print(f"Could not setup RAG: {e}")
@@ -139,7 +145,7 @@ class ModelBenchmark:
         tokenizer = self.tokenizers[model_key]
 
         context = None
-        if model_key == 'rag' and self.rag_components:
+        if model_key in ['rag', 'finetuned_rag'] and self.rag_components:
             retriever = self.rag_components['retriever']
             results = retriever.retrieve(question, top_k=5)
             context = retriever.format_retrieved_context(results)
@@ -249,7 +255,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('--dataset', default='evaluation/eval_dataset.json')
     parser.add_argument('--output', default='evaluation/results/benchmark_results.json')
-    parser.add_argument('--models', nargs='+', choices=['base', 'finetuned', 'rag'], default=['base', 'finetuned', 'rag'])
+    parser.add_argument('--models', nargs='+', choices=['base', 'finetuned', 'rag', 'finetuned_rag'],
+                        default=['base', 'finetuned', 'rag', 'finetuned_rag'])
     parser.add_argument('--max-samples', type=int, default=None)
     args = parser.parse_args()
 
@@ -257,10 +264,12 @@ if __name__ == "__main__":
 
     if 'base' in args.models or 'rag' in args.models:
         benchmark.load_base_model()
-    if 'finetuned' in args.models:
+    if 'finetuned' in args.models or 'finetuned_rag' in args.models:
         benchmark.load_finetuned_model()
     if 'rag' in args.models:
-        benchmark.setup_rag()
+        benchmark.setup_rag(use_finetuned=False)
+    if 'finetuned_rag' in args.models:
+        benchmark.setup_rag(use_finetuned=True)
 
     dataset_path = Path(__file__).parent.parent / args.dataset
     eval_dataset = load_eval_dataset(str(dataset_path))

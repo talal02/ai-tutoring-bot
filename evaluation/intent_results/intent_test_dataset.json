@@ -1,0 +1,1603 @@
+[
+    {
+      "id": 1,
+      "message": "Hello",
+      "context": {},
+      "expected_intent": "GREETING",
+      "category": "social",
+      "description": "Simple greeting"
+    },
+    {
+      "id": 2,
+      "message": "Hi there!",
+      "context": {},
+      "expected_intent": "GREETING",
+      "category": "social",
+      "description": "Friendly greeting"
+    },
+    {
+      "id": 3,
+      "message": "Good morning",
+      "context": {},
+      "expected_intent": "GREETING",
+      "category": "social",
+      "description": "Time-specific greeting"
+    },
+    {
+      "id": 4,
+      "message": "Hey, I'm ready to start learning",
+      "context": {},
+      "expected_intent": "GREETING",
+      "category": "social",
+      "description": "Greeting with learning intent"
+    },
+    {
+      "id": 5,
+      "message": "What caused the Berlin Wall to fall?",
+      "context": {},
+      "expected_intent": "QUESTION",
+      "category": "information_seeking",
+      "description": "Factual history question with question mark"
+    },
+    {
+      "id": 6,
+      "message": "What was the significance of the Treaty of Versailles",
+      "context": {},
+      "expected_intent": "QUESTION",
+      "category": "information_seeking",
+      "description": "Question without question mark"
+    },
+    {
+      "id": 7,
+      "message": "Why did the Weimar Republic fail",
+      "context": {},
+      "expected_intent": "QUESTION",
+      "category": "information_seeking",
+      "description": "Why question - causation"
+    },
+    {
+      "id": 8,
+      "message": "When was the Berlin Wall built?",
+      "context": {},
+      "expected_intent": "QUESTION",
+      "category": "information_seeking",
+      "description": "When question - timeline"
+    },
+    {
+      "id": 9,
+      "message": "Who was the first chancellor of West Germany?",
+      "context": {},
+      "expected_intent": "QUESTION",
+      "category": "information_seeking",
+      "description": "Who question - identification"
+    },
+    {
+      "id": 10,
+      "message": "How did the Marshall Plan help Germany recover",
+      "context": {},
+      "expected_intent": "QUESTION",
+      "category": "information_seeking",
+      "description": "How question - mechanism"
+    },
+    {
+      "id": 11,
+      "message": "Explain the Treaty of Versailles",
+      "context": {},
+      "expected_intent": "EXPLANATION",
+      "category": "information_seeking",
+      "description": "Command form - explain"
+    },
+    {
+      "id": 12,
+      "message": "Can you explain how the Weimar Republic was structured?",
+      "context": {},
+      "expected_intent": "EXPLANATION",
+      "category": "information_seeking",
+      "description": "Polite request for explanation"
+    },
+    {
+      "id": 13,
+      "message": "Tell me about the economic miracle in West Germany",
+      "context": {},
+      "expected_intent": "EXPLANATION",
+      "category": "information_seeking",
+      "description": "Tell me about - detailed info"
+    },
+    {
+      "id": 14,
+      "message": "Describe the Berlin Airlift",
+      "context": {},
+      "expected_intent": "EXPLANATION",
+      "category": "information_seeking",
+      "description": "Describe command"
+    },
+    {
+      "id": 15,
+      "message": "Could you elaborate on the causes of WWI?",
+      "context": {},
+      "expected_intent": "EXPLANATION",
+      "category": "information_seeking",
+      "description": "Request for elaboration"
+    },
+    {
+      "id": 16,
+      "message": "Give me an example of propaganda used by the Nazis",
+      "context": {},
+      "expected_intent": "EXAMPLE",
+      "category": "information_seeking",
+      "description": "Direct request for example"
+    },
+    {
+      "id": 17,
+      "message": "Can you show me an example?",
+      "context": {"in_explanation": true},
+      "expected_intent": "EXAMPLE",
+      "category": "information_seeking",
+      "description": "Context-dependent example request"
+    },
+    {
+      "id": 18,
+      "message": "What are some examples of primary sources from that period?",
+      "context": {},
+      "expected_intent": "EXAMPLE",
+      "category": "information_seeking",
+      "description": "Multiple examples requested"
+    },
+    {
+      "id": 19,
+      "message": "Provide an example to illustrate this",
+      "context": {"in_explanation": true},
+      "expected_intent": "EXAMPLE",
+      "category": "information_seeking",
+      "description": "Formal example request"
+    },
+    {
+      "id": 20,
+      "message": "I don't understand what you mean",
+      "context": {},
+      "expected_intent": "CLARIFICATION",
+      "category": "meta_dialogue",
+      "description": "Confusion expression"
+    },
+    {
+      "id": 21,
+      "message": "Can you rephrase that?",
+      "context": {},
+      "expected_intent": "CLARIFICATION",
+      "category": "meta_dialogue",
+      "description": "Request for rephrasing"
+    },
+    {
+      "id": 22,
+      "message": "What do you mean by Ostpolitik?",
+      "context": {"last_action": "explanation_given"},
+      "expected_intent": "CLARIFICATION",
+      "category": "meta_dialogue",
+      "description": "Clarification on specific term"
+    },
+    {
+      "id": 23,
+      "message": "I'm confused about the previous explanation",
+      "context": {"in_explanation": true},
+      "expected_intent": "CLARIFICATION",
+      "category": "meta_dialogue",
+      "description": "Confusion after explanation"
+    },
+    {
+      "id": 24,
+      "message": "Could you say that in simpler terms?",
+      "context": {},
+      "expected_intent": "CLARIFICATION",
+      "category": "meta_dialogue",
+      "description": "Request for simplification"
+    },
+    {
+      "id": 25,
+      "message": "How do I use this app?",
+      "context": {},
+      "expected_intent": "HELP",
+      "category": "meta_dialogue",
+      "description": "App usage question"
+    },
+    {
+      "id": 26,
+      "message": "What can you help me with?",
+      "context": {},
+      "expected_intent": "HELP",
+      "category": "meta_dialogue",
+      "description": "Capability inquiry"
+    },
+    {
+      "id": 27,
+      "message": "What features does this tutoring system have?",
+      "context": {},
+      "expected_intent": "HELP",
+      "category": "meta_dialogue",
+      "description": "Feature inquiry"
+    },
+    {
+      "id": 28,
+      "message": "How does this work?",
+      "context": {},
+      "expected_intent": "HELP",
+      "category": "meta_dialogue",
+      "description": "System functionality question"
+    },
+    {
+      "id": 29,
+      "message": "I need a hint",
+      "context": {"waiting_for_answer": true},
+      "expected_intent": "REQUEST_HINT",
+      "category": "assessment",
+      "description": "Direct hint request"
+    },
+    {
+      "id": 30,
+      "message": "Can you give me a clue?",
+      "context": {"waiting_for_answer": true},
+      "expected_intent": "REQUEST_HINT",
+      "category": "assessment",
+      "description": "Clue request"
+    },
+    {
+      "id": 31,
+      "message": "I'm stuck",
+      "context": {"waiting_for_answer": true},
+      "expected_intent": "REQUEST_HINT",
+      "category": "assessment",
+      "description": "Stuck expression"
+    },
+    {
+      "id": 32,
+      "message": "Give me a small hint please",
+      "context": {"waiting_for_answer": true},
+      "expected_intent": "REQUEST_HINT",
+      "category": "assessment",
+      "description": "Qualified hint request"
+    },
+    {
+      "id": 33,
+      "message": "I think the answer is the economic crisis and political instability",
+      "context": {"waiting_for_answer": true},
+      "expected_intent": "ANSWER_SUBMISSION",
+      "category": "assessment",
+      "description": "Explicit answer with 'I think'"
+    },
+    {
+      "id": 34,
+      "message": "The Berlin Wall was built in 1961",
+      "context": {"waiting_for_answer": true},
+      "expected_intent": "ANSWER_SUBMISSION",
+      "category": "assessment",
+      "description": "Declarative answer statement"
+    },
+    {
+      "id": 35,
+      "message": "My answer is that the Treaty of Versailles was too harsh on Germany",
+      "context": {"waiting_for_answer": true},
+      "expected_intent": "ANSWER_SUBMISSION",
+      "category": "assessment",
+      "description": "Explicit 'my answer is'"
+    },
+    {
+      "id": 36,
+      "message": "It was because of hyperinflation and loss of faith in democracy",
+      "context": {"waiting_for_answer": true},
+      "expected_intent": "ANSWER_SUBMISSION",
+      "category": "assessment",
+      "description": "Causal answer with 'because'"
+    },
+    {
+      "id": 37,
+      "message": "The main cause was the economic devastation from WWI",
+      "context": {"waiting_for_answer": true},
+      "expected_intent": "ANSWER_SUBMISSION",
+      "category": "assessment",
+      "description": "Answer with 'main cause'"
+    },
+    {
+      "id": 38,
+      "message": "Continue",
+      "context": {"in_explanation": true},
+      "expected_intent": "CONTINUE",
+      "category": "navigation",
+      "description": "Simple continue command"
+    },
+    {
+      "id": 39,
+      "message": "Tell me more",
+      "context": {"in_explanation": true},
+      "expected_intent": "CONTINUE",
+      "category": "navigation",
+      "description": "Request for more information"
+    },
+    {
+      "id": 40,
+      "message": "Keep going",
+      "context": {"in_explanation": true},
+      "expected_intent": "CONTINUE",
+      "category": "navigation",
+      "description": "Continuation prompt"
+    },
+    {
+      "id": 41,
+      "message": "What happened next?",
+      "context": {"in_explanation": true},
+      "expected_intent": "CONTINUE",
+      "category": "navigation",
+      "description": "Sequential continuation"
+    },
+    {
+      "id": 42,
+      "message": "Go on please",
+      "context": {"in_explanation": true},
+      "expected_intent": "CONTINUE",
+      "category": "navigation",
+      "description": "Polite continuation"
+    },
+    {
+      "id": 43,
+      "message": "Let's switch topics",
+      "context": {},
+      "expected_intent": "NEW_TOPIC",
+      "category": "navigation",
+      "description": "Topic change request"
+    },
+    {
+      "id": 44,
+      "message": "I want to learn about something else",
+      "context": {},
+      "expected_intent": "NEW_TOPIC",
+      "category": "navigation",
+      "description": "New topic with 'something else'"
+    },
+    {
+      "id": 45,
+      "message": "Can we study the Cold War instead?",
+      "context": {},
+      "expected_intent": "NEW_TOPIC",
+      "category": "navigation",
+      "description": "Specific new topic request"
+    },
+    {
+      "id": 46,
+      "message": "Different topic please",
+      "context": {},
+      "expected_intent": "NEW_TOPIC",
+      "category": "navigation",
+      "description": "Direct topic change"
+    },
+    {
+      "id": 47,
+      "message": "Thank you",
+      "context": {},
+      "expected_intent": "THANKS",
+      "category": "social",
+      "description": "Simple thanks"
+    },
+    {
+      "id": 48,
+      "message": "Thanks for the help!",
+      "context": {},
+      "expected_intent": "THANKS",
+      "category": "social",
+      "description": "Enthusiastic thanks"
+    },
+    {
+      "id": 49,
+      "message": "I appreciate your explanation",
+      "context": {},
+      "expected_intent": "THANKS",
+      "category": "social",
+      "description": "Appreciation expression"
+    },
+    {
+      "id": 50,
+      "message": "That was very helpful",
+      "context": {},
+      "expected_intent": "THANKS",
+      "category": "social",
+      "description": "Helpfulness acknowledgment"
+    },
+    {
+      "id": 51,
+      "message": "Repeat that",
+      "context": {},
+      "expected_intent": "REPEAT",
+      "category": "meta_dialogue",
+      "description": "Direct repeat command"
+    },
+    {
+      "id": 52,
+      "message": "Can you say that again?",
+      "context": {},
+      "expected_intent": "REPEAT",
+      "category": "meta_dialogue",
+      "description": "Polite repeat request"
+    },
+    {
+      "id": 53,
+      "message": "One more time please",
+      "context": {},
+      "expected_intent": "REPEAT",
+      "category": "meta_dialogue",
+      "description": "Repeat with 'one more time'"
+    },
+    {
+      "id": 54,
+      "message": "Goodbye",
+      "context": {},
+      "expected_intent": "QUIT",
+      "category": "social",
+      "description": "Simple goodbye"
+    },
+    {
+      "id": 55,
+      "message": "I'm done for today",
+      "context": {},
+      "expected_intent": "QUIT",
+      "category": "social",
+      "description": "Session end statement"
+    },
+    {
+      "id": 56,
+      "message": "Exit",
+      "context": {},
+      "expected_intent": "QUIT",
+      "category": "social",
+      "description": "Exit command"
+    },
+    {
+      "id": 57,
+      "message": "Bye",
+      "context": {},
+      "expected_intent": "QUIT",
+      "category": "social",
+      "description": "Informal goodbye"
+    },
+    {
+      "id": 58,
+      "message": "What's the weather like?",
+      "context": {},
+      "expected_intent": "UNKNOWN",
+      "category": "out_of_scope",
+      "description": "Weather question - off topic"
+    },
+    {
+      "id": 59,
+      "message": "Tell me a joke",
+      "context": {},
+      "expected_intent": "UNKNOWN",
+      "category": "out_of_scope",
+      "description": "Entertainment request"
+    },
+    {
+      "id": 60,
+      "message": "Can you help me with my math homework?",
+      "context": {},
+      "expected_intent": "UNKNOWN",
+      "category": "out_of_scope",
+      "description": "Different subject"
+    },
+    {
+      "id": 61,
+      "message": "asdfghjkl",
+      "context": {},
+      "expected_intent": "UNKNOWN",
+      "category": "out_of_scope",
+      "description": "Gibberish"
+    },
+    {
+      "id": 62,
+      "message": "???",
+      "context": {},
+      "expected_intent": "UNKNOWN",
+      "category": "out_of_scope",
+      "description": "Only punctuation"
+    },
+    {
+      "id": 63,
+      "message": "What caused the Berlin Wall to fall and can you give me an example?",
+      "context": {},
+      "expected_intent": "QUESTION",
+      "category": "edge_case_multi_intent",
+      "description": "Multi-intent: Question + Example (choose primary)"
+    },
+    {
+      "id": 64,
+      "message": "Thanks! What's next?",
+      "context": {},
+      "expected_intent": "THANKS",
+      "category": "edge_case_multi_intent",
+      "description": "Multi-intent: Thanks + Continue (choose primary)"
+    },
+    {
+      "id": 65,
+      "message": "I don't want a hint",
+      "context": {"waiting_for_answer": true},
+      "expected_intent": "ANSWER_SUBMISSION",
+      "category": "edge_case_negation",
+      "description": "Negation: NOT a hint request despite keyword"
+    },
+    {
+      "id": 66,
+      "message": "What caused the Berlin Wal to fal?",
+      "context": {},
+      "expected_intent": "QUESTION",
+      "category": "edge_case_typo",
+      "description": "Typos in question"
+    },
+    {
+      "id": 67,
+      "message": "Wat was the Treaty of Versales?",
+      "context": {},
+      "expected_intent": "QUESTION",
+      "category": "edge_case_typo",
+      "description": "Multiple typos"
+    },
+    {
+      "id": 68,
+      "message": "I think so",
+      "context": {"waiting_for_answer": true},
+      "expected_intent": "ANSWER_SUBMISSION",
+      "category": "edge_case_ambiguous",
+      "description": "Ambiguous with context"
+    },
+    {
+      "id": 69,
+      "message": "Maybe",
+      "context": {"waiting_for_answer": true},
+      "expected_intent": "ANSWER_SUBMISSION",
+      "category": "edge_case_ambiguous",
+      "description": "One-word uncertain answer"
+    },
+    {
+      "id": 70,
+      "message": "Yes",
+      "context": {"waiting_for_answer": true},
+      "expected_intent": "ANSWER_SUBMISSION",
+      "category": "edge_case_ambiguous",
+      "description": "One-word affirmative answer"
+    },
+    {
+      "id": 71,
+      "message": "That makes sense",
+      "context": {"in_explanation": true},
+      "expected_intent": "THANKS",
+      "category": "edge_case_implicit",
+      "description": "Implicit acknowledgment"
+    },
+    {
+      "id": 72,
+      "message": "Got it",
+      "context": {"in_explanation": true},
+      "expected_intent": "THANKS",
+      "category": "edge_case_implicit",
+      "description": "Understanding acknowledgment"
+    },
+    {
+      "id": 73,
+      "message": "How did Willy Brandt's Ostpolitik affect relations?",
+      "context": {},
+      "expected_intent": "QUESTION",
+      "category": "edge_case_complex",
+      "description": "Question with German term"
+    },
+    {
+      "id": 74,
+      "message": "Compare the Treaty of Versailles with the Treaty of Westphalia",
+      "context": {},
+      "expected_intent": "EXPLANATION",
+      "category": "edge_case_complex",
+      "description": "Comparison request (detailed explanation needed)"
+    },
+    {
+      "id": 75,
+      "message": "Was it economic or political factors?",
+      "context": {"waiting_for_answer": true},
+      "expected_intent": "ANSWER_SUBMISSION",
+      "category": "edge_case_question_as_answer",
+      "description": "Question form used as answer attempt"
+    },
+    {
+        "id": 76,
+        "message": "Good afternoon!",
+        "context": {},
+        "expected_intent": "GREETING",
+        "category": "social",
+        "description": "Afternoon greeting"
+      },
+      {
+        "id": 77,
+        "message": "Greetings",
+        "context": {},
+        "expected_intent": "GREETING",
+        "category": "social",
+        "description": "Formal greeting"
+      },
+      {
+        "id": 78,
+        "message": "Hi, let's begin",
+        "context": {},
+        "expected_intent": "GREETING",
+        "category": "social",
+        "description": "Greeting with start signal"
+      },
+      {
+        "id": 79,
+        "message": "Hey there",
+        "context": {},
+        "expected_intent": "GREETING",
+        "category": "social",
+        "description": "Casual greeting"
+      },
+      {
+        "id": 80,
+        "message": "Which countries signed the Treaty of Versailles?",
+        "context": {},
+        "expected_intent": "QUESTION",
+        "category": "information_seeking",
+        "description": "Which question"
+      },
+      {
+        "id": 81,
+        "message": "Did the Marshall Plan work",
+        "context": {},
+        "expected_intent": "QUESTION",
+        "category": "information_seeking",
+        "description": "Yes/No question without mark"
+      },
+      {
+        "id": 82,
+        "message": "Where was the Berlin Wall located exactly?",
+        "context": {},
+        "expected_intent": "QUESTION",
+        "category": "information_seeking",
+        "description": "Where question - location"
+      },
+      {
+        "id": 83,
+        "message": "Can you tell me when WWII started?",
+        "context": {},
+        "expected_intent": "QUESTION",
+        "category": "information_seeking",
+        "description": "Polite question form"
+      },
+      {
+        "id": 84,
+        "message": "What role did Willy Brandt play in Ostpolitik?",
+        "context": {},
+        "expected_intent": "QUESTION",
+        "category": "information_seeking",
+        "description": "Role-based question"
+      },
+      {
+        "id": 85,
+        "message": "Who were the key figures in the Weimar Republic?",
+        "context": {},
+        "expected_intent": "QUESTION",
+        "category": "information_seeking",
+        "description": "Multiple people question"
+      },
+      {
+        "id": 86,
+        "message": "How long did the Berlin Wall stand?",
+        "context": {},
+        "expected_intent": "QUESTION",
+        "category": "information_seeking",
+        "description": "Duration question"
+      },
+      {
+        "id": 87,
+        "message": "What were the main causes of hyperinflation in 1923?",
+        "context": {},
+        "expected_intent": "QUESTION",
+        "category": "information_seeking",
+        "description": "Multiple causes question"
+      },
+      {
+        "id": 88,
+        "message": "Why was Article 48 significant?",
+        "context": {},
+        "expected_intent": "QUESTION",
+        "category": "information_seeking",
+        "description": "Significance question"
+      },
+      {
+        "id": 89,
+        "message": "Could you tell me about the Nuremberg Laws?",
+        "context": {},
+        "expected_intent": "EXPLANATION",
+        "category": "information_seeking",
+        "description": "Polite explanation request"
+      },
+      {
+        "id": 90,
+        "message": "I want to know more about the Cold War",
+        "context": {},
+        "expected_intent": "EXPLANATION",
+        "category": "information_seeking",
+        "description": "Want to know more"
+      },
+      {
+        "id": 91,
+        "message": "Analyze the impact of the Treaty of Versailles",
+        "context": {},
+        "expected_intent": "EXPLANATION",
+        "category": "information_seeking",
+        "description": "Analysis request"
+      },
+      {
+        "id": 92,
+        "message": "Discuss the reunification of Germany",
+        "context": {},
+        "expected_intent": "EXPLANATION",
+        "category": "information_seeking",
+        "description": "Discussion request"
+      },
+      {
+        "id": 93,
+        "message": "Summarize the key events of 1989",
+        "context": {},
+        "expected_intent": "EXPLANATION",
+        "category": "information_seeking",
+        "description": "Summary request"
+      },
+      {
+        "id": 94,
+        "message": "Walk me through how the Weimar Republic fell",
+        "context": {},
+        "expected_intent": "EXPLANATION",
+        "category": "information_seeking",
+        "description": "Step-by-step request"
+      },
+      {
+        "id": 95,
+        "message": "Please explain the difference between East and West Germany",
+        "context": {},
+        "expected_intent": "EXPLANATION",
+        "category": "information_seeking",
+        "description": "Comparison explanation"
+      },
+      {
+        "id": 96,
+        "message": "For instance?",
+        "context": {"in_explanation": true},
+        "expected_intent": "EXAMPLE",
+        "category": "information_seeking",
+        "description": "Short example request"
+      },
+      {
+        "id": 97,
+        "message": "Like what?",
+        "context": {"in_explanation": true},
+        "expected_intent": "EXAMPLE",
+        "category": "information_seeking",
+        "description": "Casual example request"
+      },
+      {
+        "id": 98,
+        "message": "Show me a concrete case",
+        "context": {},
+        "expected_intent": "EXAMPLE",
+        "category": "information_seeking",
+        "description": "Concrete case request"
+      },
+      {
+        "id": 99,
+        "message": "What's an example of that?",
+        "context": {"in_explanation": true},
+        "expected_intent": "EXAMPLE",
+        "category": "information_seeking",
+        "description": "Example follow-up"
+      },
+      {
+        "id": 100,
+        "message": "Can you illustrate this with an example?",
+        "context": {},
+        "expected_intent": "EXAMPLE",
+        "category": "information_seeking",
+        "description": "Illustration request"
+      },
+      {
+        "id": 101,
+        "message": "I didn't get that",
+        "context": {},
+        "expected_intent": "CLARIFICATION",
+        "category": "meta_dialogue",
+        "description": "Didn't understand"
+      },
+      {
+        "id": 102,
+        "message": "Huh?",
+        "context": {},
+        "expected_intent": "CLARIFICATION",
+        "category": "meta_dialogue",
+        "description": "Confusion interjection"
+      },
+      {
+        "id": 103,
+        "message": "Could you explain that differently?",
+        "context": {},
+        "expected_intent": "CLARIFICATION",
+        "category": "meta_dialogue",
+        "description": "Different explanation request"
+      },
+      {
+        "id": 104,
+        "message": "What does that mean?",
+        "context": {"last_action": "explanation_given"},
+        "expected_intent": "CLARIFICATION",
+        "category": "meta_dialogue",
+        "description": "Meaning clarification"
+      },
+      {
+        "id": 105,
+        "message": "I'm lost",
+        "context": {"in_explanation": true},
+        "expected_intent": "CLARIFICATION",
+        "category": "meta_dialogue",
+        "description": "Lost in explanation"
+      },
+      {
+        "id": 106,
+        "message": "That's confusing",
+        "context": {},
+        "expected_intent": "CLARIFICATION",
+        "category": "meta_dialogue",
+        "description": "Confusion statement"
+      },
+      {
+        "id": 107,
+        "message": "What topics can we cover?",
+        "context": {},
+        "expected_intent": "HELP",
+        "category": "meta_dialogue",
+        "description": "Topics inquiry"
+      },
+      {
+        "id": 108,
+        "message": "What are the features of this system?",
+        "context": {},
+        "expected_intent": "HELP",
+        "category": "meta_dialogue",
+        "description": "System features question"
+      },
+      {
+        "id": 109,
+        "message": "Can you teach me about other subjects?",
+        "context": {},
+        "expected_intent": "HELP",
+        "category": "meta_dialogue",
+        "description": "Subject coverage question"
+      },
+      {
+        "id": 110,
+        "message": "How can I navigate this app?",
+        "context": {},
+        "expected_intent": "HELP",
+        "category": "meta_dialogue",
+        "description": "Navigation help"
+      },
+      {
+        "id": 111,
+        "message": "What can I ask you?",
+        "context": {},
+        "expected_intent": "HELP",
+        "category": "meta_dialogue",
+        "description": "Question scope inquiry"
+      },
+      {
+        "id": 112,
+        "message": "Help me out here",
+        "context": {"waiting_for_answer": true},
+        "expected_intent": "REQUEST_HINT",
+        "category": "assessment",
+        "description": "Casual hint request"
+      },
+      {
+        "id": 113,
+        "message": "I don't know the answer",
+        "context": {"waiting_for_answer": true},
+        "expected_intent": "REQUEST_HINT",
+        "category": "assessment",
+        "description": "Admission of not knowing"
+      },
+      {
+        "id": 114,
+        "message": "A little help?",
+        "context": {"waiting_for_answer": true},
+        "expected_intent": "REQUEST_HINT",
+        "category": "assessment",
+        "description": "Minimal help request"
+      },
+      {
+        "id": 115,
+        "message": "Point me in the right direction",
+        "context": {"waiting_for_answer": true},
+        "expected_intent": "REQUEST_HINT",
+        "category": "assessment",
+        "description": "Direction hint request"
+      },
+      {
+        "id": 116,
+        "message": "Can I get some help with this?",
+        "context": {"waiting_for_answer": true},
+        "expected_intent": "REQUEST_HINT",
+        "category": "assessment",
+        "description": "Polite help request"
+      },
+      {
+        "id": 117,
+        "message": "I'm not sure but maybe it was due to economic problems",
+        "context": {"waiting_for_answer": true},
+        "expected_intent": "ANSWER_SUBMISSION",
+        "category": "assessment",
+        "description": "Uncertain answer"
+      },
+      {
+        "id": 118,
+        "message": "Probably the economic crisis",
+        "context": {"waiting_for_answer": true},
+        "expected_intent": "ANSWER_SUBMISSION",
+        "category": "assessment",
+        "description": "Probably-prefixed answer"
+      },
+      {
+        "id": 119,
+        "message": "I'd say it was political instability",
+        "context": {"waiting_for_answer": true},
+        "expected_intent": "ANSWER_SUBMISSION",
+        "category": "assessment",
+        "description": "I'd say answer"
+      },
+      {
+        "id": 120,
+        "message": "In my opinion, the Treaty was unfair",
+        "context": {"waiting_for_answer": true},
+        "expected_intent": "ANSWER_SUBMISSION",
+        "category": "assessment",
+        "description": "Opinion-based answer"
+      },
+      {
+        "id": 121,
+        "message": "The key factor was the loss of territory",
+        "context": {"waiting_for_answer": true},
+        "expected_intent": "ANSWER_SUBMISSION",
+        "category": "assessment",
+        "description": "Key factor answer"
+      },
+      {
+        "id": 122,
+        "message": "Multiple factors including economic and political issues",
+        "context": {"waiting_for_answer": true},
+        "expected_intent": "ANSWER_SUBMISSION",
+        "category": "assessment",
+        "description": "Multiple factors answer"
+      },
+      {
+        "id": 123,
+        "message": "Economic devastation, political instability, and social unrest",
+        "context": {"waiting_for_answer": true},
+        "expected_intent": "ANSWER_SUBMISSION",
+        "category": "assessment",
+        "description": "List-form answer"
+      },
+      {
+        "id": 124,
+        "message": "Proceed",
+        "context": {"in_explanation": true},
+        "expected_intent": "CONTINUE",
+        "category": "navigation",
+        "description": "Formal continue"
+      },
+      {
+        "id": 125,
+        "message": "And then?",
+        "context": {"in_explanation": true},
+        "expected_intent": "CONTINUE",
+        "category": "navigation",
+        "description": "Sequential question"
+      },
+      {
+        "id": 126,
+        "message": "What's next?",
+        "context": {"in_explanation": true},
+        "expected_intent": "CONTINUE",
+        "category": "navigation",
+        "description": "Next request"
+      },
+      {
+        "id": 127,
+        "message": "Carry on",
+        "context": {"in_explanation": true},
+        "expected_intent": "CONTINUE",
+        "category": "navigation",
+        "description": "Carry on command"
+      },
+      {
+        "id": 128,
+        "message": "Please continue",
+        "context": {"in_explanation": true},
+        "expected_intent": "CONTINUE",
+        "category": "navigation",
+        "description": "Polite continue"
+      },
+      {
+        "id": 129,
+        "message": "More please",
+        "context": {"in_explanation": true},
+        "expected_intent": "CONTINUE",
+        "category": "navigation",
+        "description": "More request"
+      },
+      {
+        "id": 130,
+        "message": "I want to talk about World War II instead",
+        "context": {},
+        "expected_intent": "NEW_TOPIC",
+        "category": "navigation",
+        "description": "Explicit new topic"
+      },
+      {
+        "id": 131,
+        "message": "Change subject",
+        "context": {},
+        "expected_intent": "NEW_TOPIC",
+        "category": "navigation",
+        "description": "Subject change command"
+      },
+      {
+        "id": 132,
+        "message": "Let's move on to something different",
+        "context": {},
+        "expected_intent": "NEW_TOPIC",
+        "category": "navigation",
+        "description": "Move on request"
+      },
+      {
+        "id": 133,
+        "message": "Can we discuss the French Revolution?",
+        "context": {},
+        "expected_intent": "NEW_TOPIC",
+        "category": "navigation",
+        "description": "Specific topic switch"
+      },
+      {
+        "id": 134,
+        "message": "I'd like to study a new period",
+        "context": {},
+        "expected_intent": "NEW_TOPIC",
+        "category": "navigation",
+        "description": "New period request"
+      },
+      {
+        "id": 135,
+        "message": "Thanks a lot!",
+        "context": {},
+        "expected_intent": "THANKS",
+        "category": "social",
+        "description": "Enthusiastic thanks"
+      },
+      {
+        "id": 136,
+        "message": "Much appreciated",
+        "context": {},
+        "expected_intent": "THANKS",
+        "category": "social",
+        "description": "Formal appreciation"
+      },
+      {
+        "id": 137,
+        "message": "That helped a lot",
+        "context": {},
+        "expected_intent": "THANKS",
+        "category": "social",
+        "description": "Helpful acknowledgment"
+      },
+      {
+        "id": 138,
+        "message": "Great explanation, thanks",
+        "context": {},
+        "expected_intent": "THANKS",
+        "category": "social",
+        "description": "Thanks with compliment"
+      },
+      {
+        "id": 139,
+        "message": "Thx",
+        "context": {},
+        "expected_intent": "THANKS",
+        "category": "social",
+        "description": "Short thanks"
+      },
+      {
+        "id": 140,
+        "message": "Appreciate it",
+        "context": {},
+        "expected_intent": "THANKS",
+        "category": "social",
+        "description": "Casual appreciation"
+      },
+      {
+        "id": 141,
+        "message": "Could you repeat what you just said?",
+        "context": {},
+        "expected_intent": "REPEAT",
+        "category": "meta_dialogue",
+        "description": "Polite repeat request"
+      },
+      {
+        "id": 142,
+        "message": "Say that one more time",
+        "context": {},
+        "expected_intent": "REPEAT",
+        "category": "meta_dialogue",
+        "description": "One more time request"
+      },
+      {
+        "id": 143,
+        "message": "Again please",
+        "context": {},
+        "expected_intent": "REPEAT",
+        "category": "meta_dialogue",
+        "description": "Short repeat request"
+      },
+      {
+        "id": 144,
+        "message": "I missed that, can you repeat?",
+        "context": {},
+        "expected_intent": "REPEAT",
+        "category": "meta_dialogue",
+        "description": "Missed it repeat"
+      },
+      {
+        "id": 145,
+        "message": "I'm finished studying",
+        "context": {},
+        "expected_intent": "QUIT",
+        "category": "social",
+        "description": "Finished statement"
+      },
+      {
+        "id": 146,
+        "message": "See you later",
+        "context": {},
+        "expected_intent": "QUIT",
+        "category": "social",
+        "description": "See you later"
+      },
+      {
+        "id": 147,
+        "message": "That's all for now",
+        "context": {},
+        "expected_intent": "QUIT",
+        "category": "social",
+        "description": "Session end"
+      },
+      {
+        "id": 148,
+        "message": "Stop",
+        "context": {},
+        "expected_intent": "QUIT",
+        "category": "social",
+        "description": "Stop command"
+      },
+      {
+        "id": 149,
+        "message": "I have to go",
+        "context": {},
+        "expected_intent": "QUIT",
+        "category": "social",
+        "description": "Have to leave"
+      },
+      {
+        "id": 150,
+        "message": "Write me a Python program",
+        "context": {},
+        "expected_intent": "UNKNOWN",
+        "category": "out_of_scope",
+        "description": "Programming request"
+      },
+      {
+        "id": 151,
+        "message": "How do I solve 2+2?",
+        "context": {},
+        "expected_intent": "UNKNOWN",
+        "category": "out_of_scope",
+        "description": "Math question"
+      },
+      {
+        "id": 152,
+        "message": "What movies should I watch?",
+        "context": {},
+        "expected_intent": "UNKNOWN",
+        "category": "out_of_scope",
+        "description": "Movie recommendation"
+      },
+      {
+        "id": 153,
+        "message": "Are you a robot?",
+        "context": {},
+        "expected_intent": "UNKNOWN",
+        "category": "out_of_scope",
+        "description": "Personal question about AI"
+      },
+      {
+        "id": 154,
+        "message": "qwerty uiop",
+        "context": {},
+        "expected_intent": "UNKNOWN",
+        "category": "out_of_scope",
+        "description": "Keyboard mashing"
+      },
+      {
+        "id": 155,
+        "message": "lol lol lol",
+        "context": {},
+        "expected_intent": "UNKNOWN",
+        "category": "out_of_scope",
+        "description": "Repetitive text"
+      },
+      {
+        "id": 156,
+        "message": "!@#$%",
+        "context": {},
+        "expected_intent": "UNKNOWN",
+        "category": "out_of_scope",
+        "description": "Special characters only"
+      },
+      {
+        "id": 157,
+        "message": "Wen was the Berlen Wall bilt?",
+        "context": {},
+        "expected_intent": "QUESTION",
+        "category": "edge_case_typo",
+        "description": "Multiple spelling errors"
+      },
+      {
+        "id": 158,
+        "message": "Explane the Trety of Versailes",
+        "context": {},
+        "expected_intent": "EXPLANATION",
+        "category": "edge_case_typo",
+        "description": "Typos in explanation request"
+      },
+      {
+        "id": 159,
+        "message": "Giv me a exampel",
+        "context": {},
+        "expected_intent": "EXAMPLE",
+        "category": "edge_case_typo",
+        "description": "Typos in example request"
+      },
+      {
+        "id": 160,
+        "message": "I dont understnd",
+        "context": {},
+        "expected_intent": "CLARIFICATION",
+        "category": "edge_case_typo",
+        "description": "Typo in clarification"
+      },
+      {
+        "id": 161,
+        "message": "No hint needed",
+        "context": {"waiting_for_answer": true},
+        "expected_intent": "ANSWER_SUBMISSION",
+        "category": "edge_case_negation",
+        "description": "Negation of hint"
+      },
+      {
+        "id": 162,
+        "message": "Don't repeat yourself",
+        "context": {},
+        "expected_intent": "CLARIFICATION",
+        "category": "edge_case_negation",
+        "description": "Negation but not repeat intent"
+      },
+      {
+        "id": 163,
+        "message": "I'm not done yet",
+        "context": {},
+        "expected_intent": "CONTINUE",
+        "category": "edge_case_negation",
+        "description": "Not done = continue"
+      },
+      {
+        "id": 164,
+        "message": "No",
+        "context": {"waiting_for_answer": true},
+        "expected_intent": "ANSWER_SUBMISSION",
+        "category": "edge_case_ambiguous",
+        "description": "One word negative answer"
+      },
+      {
+        "id": 165,
+        "message": "Okay",
+        "context": {"in_explanation": true},
+        "expected_intent": "THANKS",
+        "category": "edge_case_ambiguous",
+        "description": "Okay as acknowledgment"
+      },
+      {
+        "id": 166,
+        "message": "I see",
+        "context": {"in_explanation": true},
+        "expected_intent": "THANKS",
+        "category": "edge_case_implicit",
+        "description": "I see acknowledgment"
+      },
+      {
+        "id": 167,
+        "message": "Makes sense now",
+        "context": {},
+        "expected_intent": "THANKS",
+        "category": "edge_case_implicit",
+        "description": "Understanding statement"
+      },
+      {
+        "id": 168,
+        "message": "Uh huh",
+        "context": {"in_explanation": true},
+        "expected_intent": "CONTINUE",
+        "category": "edge_case_implicit",
+        "description": "Minimal acknowledgment"
+      },
+      {
+        "id": 169,
+        "message": "Interesting",
+        "context": {"in_explanation": true},
+        "expected_intent": "CONTINUE",
+        "category": "edge_case_implicit",
+        "description": "Interest acknowledgment"
+      },
+      {
+        "id": 170,
+        "message": "What caused WWI and why did it last so long?",
+        "context": {},
+        "expected_intent": "QUESTION",
+        "category": "edge_case_multi_intent",
+        "description": "Two questions combined"
+      },
+      {
+        "id": 171,
+        "message": "Explain the Treaty and give me an example",
+        "context": {},
+        "expected_intent": "EXPLANATION",
+        "category": "edge_case_multi_intent",
+        "description": "Explanation + example request"
+      },
+      {
+        "id": 172,
+        "message": "Thanks, can we continue?",
+        "context": {},
+        "expected_intent": "THANKS",
+        "category": "edge_case_multi_intent",
+        "description": "Thanks + continue"
+      },
+      {
+        "id": 173,
+        "message": "What about the role of propaganda?",
+        "context": {"in_explanation": true},
+        "expected_intent": "QUESTION",
+        "category": "edge_case_complex",
+        "description": "Follow-up question during explanation"
+      },
+      {
+        "id": 174,
+        "message": "Was the Treaty fair or unfair?",
+        "context": {"waiting_for_answer": true},
+        "expected_intent": "ANSWER_SUBMISSION",
+        "category": "edge_case_question_as_answer",
+        "description": "Opinion question as answer"
+      },
+      {
+        "id": 175,
+        "message": "Could it have been prevented?",
+        "context": {"waiting_for_answer": true},
+        "expected_intent": "ANSWER_SUBMISSION",
+        "category": "edge_case_question_as_answer",
+        "description": "Counterfactual question as answer"
+      },
+      {
+        "id": 176,
+        "message": "Define Ostpolitik",
+        "context": {},
+        "expected_intent": "QUESTION",
+        "category": "information_seeking",
+        "description": "Definition request"
+      },
+      {
+        "id": 177,
+        "message": "List the causes of the Weimar Republic's collapse",
+        "context": {},
+        "expected_intent": "QUESTION",
+        "category": "information_seeking",
+        "description": "List request"
+      },
+      {
+        "id": 178,
+        "message": "Name three key figures in Nazi Germany",
+        "context": {},
+        "expected_intent": "QUESTION",
+        "category": "information_seeking",
+        "description": "Name request"
+      },
+      {
+        "id": 179,
+        "message": "Quiz me on the Berlin Wall",
+        "context": {},
+        "expected_intent": "QUESTION",
+        "category": "information_seeking",
+        "description": "Quiz request"
+      },
+      {
+        "id": 180,
+        "message": "Ask me a question about WWII",
+        "context": {},
+        "expected_intent": "QUESTION",
+        "category": "information_seeking",
+        "description": "Ask me question request"
+      },
+      {
+        "id": 181,
+        "message": "Outline the events leading to German reunification",
+        "context": {},
+        "expected_intent": "EXPLANATION",
+        "category": "information_seeking",
+        "description": "Outline request"
+      },
+      {
+        "id": 182,
+        "message": "Break down the structure of the Weimar Constitution",
+        "context": {},
+        "expected_intent": "EXPLANATION",
+        "category": "information_seeking",
+        "description": "Break down request"
+      },
+      {
+        "id": 183,
+        "message": "Contrast East and West Germany",
+        "context": {},
+        "expected_intent": "EXPLANATION",
+        "category": "information_seeking",
+        "description": "Contrast request"
+      },
+      {
+        "id": 184,
+        "message": "Evaluate the effectiveness of the Marshall Plan",
+        "context": {},
+        "expected_intent": "EXPLANATION",
+        "category": "information_seeking",
+        "description": "Evaluation request"
+      },
+      {
+        "id": 185,
+        "message": "How would you explain this to a 10-year-old?",
+        "context": {},
+        "expected_intent": "CLARIFICATION",
+        "category": "meta_dialogue",
+        "description": "Simplification level request"
+      },
+      {
+        "id": 186,
+        "message": "Can you use simpler words?",
+        "context": {},
+        "expected_intent": "CLARIFICATION",
+        "category": "meta_dialogue",
+        "description": "Simpler language request"
+      },
+      {
+        "id": 187,
+        "message": "This is too complicated",
+        "context": {},
+        "expected_intent": "CLARIFICATION",
+        "category": "meta_dialogue",
+        "description": "Too complicated feedback"
+      },
+      {
+        "id": 188,
+        "message": "I need that broken down more",
+        "context": {},
+        "expected_intent": "CLARIFICATION",
+        "category": "meta_dialogue",
+        "description": "More breakdown request"
+      },
+      {
+        "id": 189,
+        "message": "Not quite following",
+        "context": {"in_explanation": true},
+        "expected_intent": "CLARIFICATION",
+        "category": "meta_dialogue",
+        "description": "Not following statement"
+      },
+      {
+        "id": 190,
+        "message": "I'm really stuck on this one",
+        "context": {"waiting_for_answer": true},
+        "expected_intent": "REQUEST_HINT",
+        "category": "assessment",
+        "description": "Really stuck emphasis"
+      },
+      {
+        "id": 191,
+        "message": "This is hard, can you help?",
+        "context": {"waiting_for_answer": true},
+        "expected_intent": "REQUEST_HINT",
+        "category": "assessment",
+        "description": "Difficulty + help request"
+      },
+      {
+        "id": 192,
+        "message": "Just a tiny hint",
+        "context": {"waiting_for_answer": true},
+        "expected_intent": "REQUEST_HINT",
+        "category": "assessment",
+        "description": "Tiny hint request"
+      },
+      {
+        "id": 193,
+        "message": "I believe it happened in 1961",
+        "context": {"waiting_for_answer": true},
+        "expected_intent": "ANSWER_SUBMISSION",
+        "category": "assessment",
+        "description": "I believe answer"
+      },
+      {
+        "id": 194,
+        "message": "From what I understand, it was economic",
+        "context": {"waiting_for_answer": true},
+        "expected_intent": "ANSWER_SUBMISSION",
+        "category": "assessment",
+        "description": "From what I understand"
+      },
+      {
+        "id": 195,
+        "message": "If I remember correctly, the Treaty was signed in 1919",
+        "context": {"waiting_for_answer": true},
+        "expected_intent": "ANSWER_SUBMISSION",
+        "category": "assessment",
+        "description": "If I remember correctly"
+      },
+      {
+        "id": 196,
+        "message": "I'm guessing economic factors?",
+        "context": {"waiting_for_answer": true},
+        "expected_intent": "ANSWER_SUBMISSION",
+        "category": "assessment",
+        "description": "Guessing answer"
+      },
+      {
+        "id": 197,
+        "message": "Not sure, but economic crisis?",
+        "context": {"waiting_for_answer": true},
+        "expected_intent": "ANSWER_SUBMISSION",
+        "category": "assessment",
+        "description": "Uncertain guess"
+      },
+      {
+        "id": 198,
+        "message": "Keep on",
+        "context": {"in_explanation": true},
+        "expected_intent": "CONTINUE",
+        "category": "navigation",
+        "description": "Keep on command"
+      },
+      {
+        "id": 199,
+        "message": "Don't stop",
+        "context": {"in_explanation": true},
+        "expected_intent": "CONTINUE",
+        "category": "navigation",
+        "description": "Don't stop = continue"
+      },
+      {
+        "id": 200,
+        "message": "That's enough for today, thanks",
+        "context": {},
+        "expected_intent": "QUIT",
+        "category": "social",
+        "description": "Enough + thanks quit"
+      }
+      
+  ]  

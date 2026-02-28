@@ -206,11 +206,16 @@ class ErrorAnalyzer:
             if context:
                 parts.append(f"\nCorrect information: {context[:300]}")
             parts.append(
-                "\nIs there any error in the student's reasoning? "
-                "Reply in ONE sentence only. Do not use numbered steps. "
-                "If yes, state what is wrong. If no, say 'No major errors'."
+                "\nCRITICAL RULES:\n"
+                "- Reply in ONE sentence only\n"
+                "- Do NOT hallucinate student responses\n"
+                "- Do NOT add dialogue or commentary\n"
+                "- State what is wrong, or say 'No major errors'\n\n"
+                "Error analysis:"
             )
             response = self.llm_generator.generate(prompt="\n".join(parts), temperature=0.5, max_new_tokens=150)
+            # Clean hallucinated content
+            response = self._clean_error_output(response)
             if any(w in response.lower() for w in ('error', 'mistake', 'incorrect', 'wrong')):
                 raw = response.strip()
                 period_pos = raw.find('.')
@@ -224,16 +229,26 @@ class ErrorAnalyzer:
             logger.error(f"LLM error check failed: {e}")
         return None
 
+    def _clean_error_output(self, raw: str) -> str:
+        """Remove hallucinated student responses and meta-commentary from error check"""
+        raw = re.sub(r"Student'?s? (response|attempt|answer):.*", "", raw, flags=re.IGNORECASE | re.DOTALL)
+        raw = re.sub(r"(Please wait|Is this enough|Let me help).*", "", raw, flags=re.IGNORECASE | re.DOTALL)
+        raw = re.sub(r"(Tutor:|Student:|Error:)", "", raw, flags=re.IGNORECASE)
+        return raw.strip()
+
     def provide_feedback(self, question: str, student_answer: str, errors: List[ErrorDiagnosis]) -> str:
         if not errors or (len(errors) == 1 and errors[0].error_type == ErrorType.NONE):
-            return "Good effort! Your answer shows understanding. Consider adding more specific details or evidence to strengthen it."
+            return "Good effort! Consider adding more specific details or evidence."
+
         primary = errors[0]
-        parts = [f"**Feedback**: {primary.explanation}", f"\n**Suggestion**: {primary.suggestion}"]
+        # Provide concise, conversational feedback
+        feedback = f"{primary.explanation}\n\n{primary.suggestion}"
+
         if len(errors) > 1:
-            others = [e.error_type.value for e in errors[1:] if e.error_type != ErrorType.NONE]
+            others = [e.error_type.value.replace('_', ' ') for e in errors[1:] if e.error_type != ErrorType.NONE]
             if others:
-                parts.append(f"\nAlso consider: {', '.join(others)}")
-        return "\n".join(parts)
+                feedback += f"\n\nAlso watch for: {', '.join(others)}."
+        return feedback
 
     def is_answer_correct(self, question: str, student_answer: str, context: Optional[str] = None) -> bool:
         errors = self.analyze_answer(question, student_answer, context)
