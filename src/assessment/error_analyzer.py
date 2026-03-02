@@ -30,6 +30,7 @@ class ErrorDiagnosis:
 
 
 class ErrorAnalyzer:
+    _YEAR_RE = re.compile(r'\b(1[5-9]\d{2}|20\d{2})\b')
     PRESENTISM_PATTERNS = [
         r'\b(should have|ought to have|why didn\'?t they just)\b',
         r'\b(obviously|clearly|simple|easy)\b.*\b(solution|answer)\b',
@@ -103,6 +104,7 @@ class ErrorAnalyzer:
             self._check_anachronism(question, student_answer, context),
             self._check_oversimplification(student_answer),
             self._check_lack_of_evidence(student_answer),
+            self._check_temporal_factuality(question, student_answer, context),
         ):
             if check:
                 errors.append(check)
@@ -120,6 +122,73 @@ class ErrorAnalyzer:
             ))
         logger.debug(f"Found {len(errors)} error(s)")
         return errors
+
+    def _check_temporal_factuality(self, question: str, answer: str, context: Optional[str]) -> Optional[ErrorDiagnosis]:
+        """Validate year-based answers against likely expected years from context."""
+        answer_years = self._extract_years(answer)
+        requires_year = self._question_requests_year(question)
+        if requires_year and not answer_years:
+            return ErrorDiagnosis(
+                error_type=ErrorType.LACK_OF_EVIDENCE,
+                confidence=0.75,
+                explanation="The question asks for a year, but your answer does not include one.",
+                suggestion="Provide the specific year and a short supporting detail.",
+            )
+
+        if not answer_years:
+            return None
+
+        expected_years = self._expected_years_from_context(question, context)
+        if not expected_years:
+            return None
+
+        overlap = sorted(answer_years.intersection(expected_years))
+        if overlap:
+            return None
+
+        expected_preview = ", ".join(str(y) for y in sorted(expected_years)[:3])
+        actual_preview = ", ".join(str(y) for y in sorted(answer_years)[:3])
+        return ErrorDiagnosis(
+            error_type=ErrorType.ANACHRONISM,
+            confidence=0.9 if requires_year else 0.75,
+            explanation=(
+                f"Your year appears incorrect for this event. You answered {actual_preview}, "
+                f"but the context points to {expected_preview}."
+            ),
+            suggestion="Re-check the event date in the source context and answer with the exact year.",
+        )
+
+    def _question_requests_year(self, question: str) -> bool:
+        q = question.lower()
+        return bool(re.search(r'\b(what\s+year|which\s+year|when|date|year\b)\b', q))
+
+    def _extract_years(self, text: str) -> set:
+        return {int(y) for y in self._YEAR_RE.findall(text or "")}
+
+    def _expected_years_from_context(self, question: str, context: Optional[str]) -> set:
+        if not context:
+            return set()
+
+        q = question.lower()
+        trigger_keywords = [
+            "fall", "fell", "built", "signed", "founded", "declared", "started", "ended", "unification"
+        ]
+        focus_keywords = [k for k in trigger_keywords if k in q]
+        if "berlin wall" in q and ("fall" in q or "fell" in q):
+            focus_keywords.extend(["fall", "fell", "opened"])
+
+        candidate_years = set()
+        sentences = re.split(r'(?<=[.!?])\s+', context)
+        if focus_keywords:
+            for sent in sentences:
+                sent_l = sent.lower()
+                if any(k in sent_l for k in focus_keywords):
+                    candidate_years.update(self._extract_years(sent))
+
+        if not candidate_years:
+            candidate_years = self._extract_years(context)
+
+        return candidate_years
 
     def _check_presentism(self, answer: str) -> Optional[ErrorDiagnosis]:
         for pattern in self.PRESENTISM_PATTERNS:
@@ -216,6 +285,8 @@ class ErrorAnalyzer:
             response = self.llm_generator.generate(prompt="\n".join(parts), temperature=0.5, max_new_tokens=150)
             # Clean hallucinated content
             response = self._clean_error_output(response)
+            if re.search(r'\[\s*insert|template|what is wrong with this response', response, re.IGNORECASE):
+                return None
             if any(w in response.lower() for w in ('error', 'mistake', 'incorrect', 'wrong')):
                 raw = response.strip()
                 period_pos = raw.find('.')
@@ -250,7 +321,40 @@ class ErrorAnalyzer:
                 feedback += f"\n\nAlso watch for: {', '.join(others)}."
         return feedback
 
-    def is_answer_correct(self, question: str, student_answer: str, context: Optional[str] = None) -> bool:
-        errors = self.analyze_answer(question, student_answer, context)
+    def is_answer_correct(self, question: str, student_answer: str, context: Optional[str] = None,
+                          errors: Optional[List[ErrorDiagnosis]] = None) -> bool:
+        errors = errors if errors is not None else self.analyze_answer(question, student_answer, context)
         has_major_errors = any(e.error_type != ErrorType.NONE and e.confidence > 0.6 for e in errors)
-        return not has_major_errors and len(student_answer.split()) >= 10
+        if has_major_errors or len(student_answer.split()) < 10:
+            return False
+
+        # Final gate: if context is available, require answer to be supported by it.
+        if context and self.llm_generator and not self._is_contextually_supported(question, student_answer, context):
+            return False
+
+        return True
+
+    def _is_contextually_supported(self, question: str, student_answer: str, context: str) -> bool:
+        """Return True if answer is supported by retrieved context; conservative NO/UNKNOWN handling."""
+        try:
+            prompt = (
+                "You are a strict factual grader.\n"
+                "Given the question, student answer, and source context, decide if the answer is factually supported.\n"
+                "Reply with EXACTLY one token: SUPPORTED, CONTRADICTED, or UNKNOWN.\n\n"
+                f"Question: {question}\n"
+                f"Student answer: {student_answer}\n"
+                f"Context: {context[:800]}\n\n"
+                "Verdict:"
+            )
+            verdict = self.llm_generator.generate(
+                prompt=prompt,
+                temperature=0.1,
+                do_sample=False,
+                max_new_tokens=6,
+            )
+            verdict_norm = (verdict or "").strip().upper()
+            return verdict_norm.startswith("SUPPORTED")
+        except Exception as e:
+            logger.error(f"Context support check failed: {e}")
+            # Fail-closed to avoid incorrectly marking fabricated answers as correct.
+            return False

@@ -50,7 +50,12 @@ class AssessmentEngine:
                       context: Optional[str] = None, provide_feedback: bool = True) -> AssessmentResult:
         logger.info("Assessing student answer")
         errors = self.error_analyzer.analyze_answer(question=question, student_answer=student_answer, context=context)
-        is_correct = self.error_analyzer.is_answer_correct(question=question, student_answer=student_answer, context=context)
+        is_correct = self.error_analyzer.is_answer_correct(
+            question=question,
+            student_answer=student_answer,
+            context=context,
+            errors=errors,
+        )
         if provide_feedback:
             feedback = self._generate_positive_feedback(student_answer, errors) if is_correct else \
                        self._generate_corrective_feedback(question, student_answer, errors, context)
@@ -77,7 +82,16 @@ class AssessmentEngine:
         minor_issues = [e for e in errors if e.error_type != ErrorType.NONE and e.confidence < 0.7]
         if not minor_issues:
             return "Excellent work! Your answer demonstrates good understanding of the topic. You've provided clear reasoning and appropriate evidence."
-        return f"Good answer! You've captured the main points correctly. One small suggestion: {minor_issues[0].suggestion}"
+        suggestion = self._clean_feedback_snippet(minor_issues[0].suggestion)
+        return f"One small suggestion: {suggestion}"
+
+    def _clean_feedback_snippet(self, text: str) -> str:
+        snippet = (text or "").strip()
+        # Remove common list-prefix artifacts from weak generations, e.g. "1.".
+        snippet = re.sub(r'^\s*\d+\s*[.)-]?\s*', '', snippet)
+        if len(snippet) < 8:
+            return "Add one concrete historical detail (date, actor, or event) to strengthen your answer."
+        return snippet
 
     def _generate_corrective_feedback(self, question: str, student_answer: str,
                                        errors: List[ErrorDiagnosis], context: Optional[str]) -> str:

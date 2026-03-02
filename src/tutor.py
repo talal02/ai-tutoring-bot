@@ -1,6 +1,7 @@
 from pathlib import Path
 from typing import Optional, Dict, Any
 import sys
+import re
 
 sys.path.append(str(Path(__file__).parent))
 
@@ -20,6 +21,11 @@ logger = get_logger(__name__)
 
 
 class HistoryTutor:
+    _QUIZ_REQUEST_RE = re.compile(
+        r"\b(quiz\s+me|ask\s+me\s+(a\s+)?question|test\s+me|give\s+me\s+(a\s+)?quiz)\b",
+        re.IGNORECASE,
+    )
+
     def __init__(self, config_path: Optional[str] = None):
         self.config = get_config(config_path)
 
@@ -139,20 +145,29 @@ class HistoryTutor:
         elif intent == Intent.UNKNOWN:
             response = self._handle_unknown()
         else:
-            if intent == Intent.QUESTION:
-                self.dialogue_manager.set_current_question(message)
-
+            is_quiz_turn = intent == Intent.QUESTION and self._is_quiz_request(message)
             context = None
             self.last_sources = []
             if use_rag and strategy.get('use_rag') and self.retriever:
-                results = self.retriever.retrieve(message, top_k=5)
+                retrieval_query = (
+                    strategy.get('question')
+                    or strategy.get('student_answer')
+                    or strategy.get('student_response')
+                    or message
+                )
+                results = self.retriever.retrieve(retrieval_query, top_k=5)
                 context = self.retriever.format_retrieved_context(results)
                 self.last_sources = results  # cache so API avoids a second retrieval
                 self.logger.info(f"Retrieved {len(results)} context documents")
             elif use_rag and not self.retriever:
                 self.logger.warning("RAG requested but retriever not initialized")
 
-            if strategy.get('assessment_needed') and self.assessment_engine:
+            if is_quiz_turn:
+                response = self._generate_quiz_question(message, context)
+                # Track the exact quiz question asked by the tutor.
+                self.dialogue_manager.set_current_question(response)
+
+            elif strategy.get('assessment_needed') and self.assessment_engine:
                 action = strategy.get('action')
 
                 if action == 'provide_hint':
@@ -179,7 +194,13 @@ class HistoryTutor:
                 else:
                     response = self._generate_llm_response(message, context)
             else:
-                response = self._generate_llm_response(message, context)
+                action = strategy.get('action')
+                if action == 'hint_limit_reached':
+                    response = strategy.get('message', "You've used all hints for this question. Try answering now.")
+                elif action == 'fallback_question' and strategy.get('fallback_message'):
+                    response = strategy['fallback_message']
+                else:
+                    response = self._generate_llm_response(message, context)
 
         self.dialogue_manager.record_response(
             user_message=message,
@@ -248,6 +269,43 @@ class HistoryTutor:
             "Try asking a history question, requesting an explanation, or saying "
             "'Ask me a question about [topic]' to get quizzed."
         )
+
+    def _is_quiz_request(self, message: str) -> bool:
+        return bool(self._QUIZ_REQUEST_RE.search(message))
+
+    def _generate_quiz_question(self, user_request: str, context: Optional[str]) -> str:
+        if not self.generator:
+            return "What year did the Berlin Wall fall?"
+
+        prompt_parts = [
+            "You are a history tutor creating a quiz item.",
+            "Output EXACTLY ONE short question.",
+            "Do NOT include an answer, explanation, options, or any extra text.",
+            "Question must end with '?'.",
+            f"Student request: {user_request}",
+        ]
+        if context:
+            prompt_parts.append(f"Source context: {context[:350]}")
+        prompt_parts.append("Quiz question:")
+
+        prompt = self.generator.format_chat_prompt(user_message="\n".join(prompt_parts))
+        raw = self.generator.generate(prompt=prompt, temperature=0.4, max_new_tokens=48)
+        question = self._extract_first_question(raw)
+        return question or "What key event marked German reunification?"
+
+    def _extract_first_question(self, text: str) -> str:
+        if not text:
+            return ""
+        cleaned = text.replace("\n", " ").strip().strip('"\'')
+        q_idx = cleaned.find('?')
+        if q_idx == -1:
+            return ""
+        candidate = cleaned[:q_idx + 1].strip()
+        # Keep only the final sentence fragment if the model adds preamble.
+        for sep in [". ", ": ", " - "]:
+            if sep in candidate:
+                candidate = candidate.split(sep)[-1].strip()
+        return candidate if candidate.endswith('?') else ""
 
     def reset(self) -> None:
         self.dialogue_manager.reset_conversation()

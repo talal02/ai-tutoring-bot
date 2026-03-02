@@ -83,6 +83,11 @@ class HintGenerator:
         ]
         if student_response:
             parts.append(f"\nStudent's wrong answer: {student_response}")
+        if previous_hints:
+            recent_hints = previous_hints[-2:]
+            parts.append("\nPrevious hints (avoid repeating these):")
+            for hint in recent_hints:
+                parts.append(f"- {hint}")
         if context:
             parts.append(f"\nContext: {context[:200]}")
         parts.append(f"\n{instructions[hint_level]}\n\nHint:")
@@ -93,7 +98,9 @@ class HintGenerator:
         raw_hint = re.sub(r"Student'?s? (response|attempt|answer):.*", "", raw_hint, flags=re.IGNORECASE | re.DOTALL)
         raw_hint = re.sub(r"(Please wait|Is this enough|Let me help you|Now that you|Should I).*", "", raw_hint, flags=re.IGNORECASE | re.DOTALL)
         raw_hint = re.sub(r"Answer:.*", "", raw_hint, flags=re.IGNORECASE | re.DOTALL)
+        raw_hint = re.sub(r"\([^)]*(note|answer|part\s*\d+|student|hint)[^)]*\)", "", raw_hint, flags=re.IGNORECASE)
         raw_hint = re.sub(r"(Tutor:|Student:|Hint \d+:)", "", raw_hint, flags=re.IGNORECASE)
+        raw_hint = re.sub(r"\s+", " ", raw_hint).strip()
         sentences = [s.strip() for s in re.split(r'[.!?]+', raw_hint) if s.strip()]
         if not sentences:
             return self._fallback_hint(hint_level)

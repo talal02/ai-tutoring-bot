@@ -28,6 +28,8 @@ class LessonState:
     attempts: int = 0
     hints_given: List[str] = field(default_factory=list)
     hints_used: int = 0
+    last_student_answer: Optional[str] = None
+    last_answer_correct: Optional[bool] = None
     correct_answers: int = 0
     incorrect_answers: int = 0
     topics_covered: List[str] = field(default_factory=list)
@@ -41,6 +43,8 @@ class LessonState:
         self.attempts = 0
         self.hints_given = []
         self.hints_used = 0
+        self.last_student_answer = None
+        self.last_answer_correct = None
         self.start_time = datetime.now()
         self.last_updated = datetime.now()
 
@@ -54,6 +58,8 @@ class LessonState:
             'current_question': self.current_question,
             'attempts': self.attempts,
             'hints_used': self.hints_used,
+            'last_student_answer': self.last_student_answer,
+            'last_answer_correct': self.last_answer_correct,
             'correct_answers': self.correct_answers,
             'incorrect_answers': self.incorrect_answers,
             'topics_covered': self.topics_covered,
@@ -130,6 +136,9 @@ class ConversationState:
 
 
 class DialogueManager:
+    HINT_LEVEL_SEQUENCE: ClassVar[List[str]] = ["nudge", "partial", "full"]
+    MAX_HINTS_PER_QUESTION: ClassVar[int] = 3
+
     # Static response strategies — covers every intent that needs no dynamic fields.
     _STRATEGY_TABLE: ClassVar[Dict[Intent, Dict]] = {
         Intent.GREETING:      {"action": "greeting",            "use_rag": False, "assessment_needed": False},
@@ -190,11 +199,39 @@ class DialogueManager:
             return {'action': 'new_topic', 'use_rag': True, 'assessment_needed': False, 'topic': new_topic}
 
         if intent == Intent.REQUEST_HINT:
+            if not self.lesson.current_question:
+                return {
+                    'action': 'fallback_question',
+                    'use_rag': True,
+                    'assessment_needed': False,
+                    'fallback_message': "I can give hints once we've started a quiz question. Ask me to quiz you on a topic first.",
+                }
+
+            if self.lesson.hints_used >= self.MAX_HINTS_PER_QUESTION:
+                return {
+                    'action': 'hint_limit_reached',
+                    'use_rag': False,
+                    'assessment_needed': False,
+                    'message': (
+                        "You've reached the 3-hint limit for this question. "
+                        "Try answering now, or ask for a new quiz question."
+                    ),
+                }
+
+            entities = intent_result.entities or {}
+            explicit_level = bool(entities.get('explicit_hint_level', False))
+            requested_level = entities.get('hint_level') if explicit_level else None
+
+            if requested_level:
+                hint_level = requested_level
+            else:
+                hint_level = self._next_hint_level()
+
             return {
                 'action': 'provide_hint',
-                'hint_level': intent_result.entities.get('hint_level', 'partial'),
+                'hint_level': hint_level,
                 'question': self.lesson.current_question or self._get_last_topic_context(),
-                'student_response': message,
+                'student_response': self.lesson.last_student_answer or "",
                 'use_rag': True,
                 'assessment_needed': True,
             }
@@ -224,13 +261,13 @@ class DialogueManager:
         intent = intent_result.intent
         if intent == Intent.REQUEST_HINT:
             self.conversation.update_context('last_action', 'hint_requested')
-            self.lesson.hints_used += 1
         elif intent == Intent.ANSWER_SUBMISSION:
             self.conversation.update_context('last_action', 'answer_submitted')
             self.lesson.attempts += 1
+            self.lesson.last_student_answer = message
+            self.lesson.last_answer_correct = None
         elif intent == Intent.QUESTION:
             self.conversation.update_context('last_action', 'question_asked')
-            self.lesson.current_question = message
         if intent in [Intent.EXPLANATION, Intent.EXAMPLE]:
             self.conversation.update_context('in_explanation', True)
         else:
@@ -247,6 +284,7 @@ class DialogueManager:
         )
 
     def update_lesson_result(self, correct: bool) -> None:
+        self.lesson.last_answer_correct = correct
         if correct:
             self.lesson.correct_answers += 1
             self.conversation.update_context('last_action', 'correct_answer')
@@ -266,10 +304,18 @@ class DialogueManager:
         self.lesson.attempts = 0
         self.lesson.hints_given = []
         self.lesson.hints_used = 0
+        self.lesson.last_student_answer = None
+        self.lesson.last_answer_correct = None
 
     def add_hint_given(self, hint: str, level: str) -> None:
+        self.lesson.hints_used += 1
         self.lesson.hints_given.append(f"{level}: {hint}")
         self.conversation.update_context('last_action', 'hint_given')
+
+    def _next_hint_level(self) -> str:
+        # Auto-progression by hint count: 0->nudge, 1->partial, 2+->full
+        idx = min(self.lesson.hints_used, len(self.HINT_LEVEL_SEQUENCE) - 1)
+        return self.HINT_LEVEL_SEQUENCE[idx]
 
     _TOPIC_RE = re.compile(
         r'\b(?:about|learn|study|cover|switch\s+to|change\s+to|interested\s+in|know\s+about)\s+'

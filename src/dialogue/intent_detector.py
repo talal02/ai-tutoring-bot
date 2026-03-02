@@ -633,10 +633,10 @@ class IntentDetector:
             return {}
 
         if re.search(r'\b(big|major|more|full)\s+hint\b', message, re.IGNORECASE):
-            return {"hint_level": "full"}
+            return {"hint_level": "full", "explicit_hint_level": True}
         if re.search(r'\b(small|little|subtle|tiny)\s+hint\b', message, re.IGNORECASE):
-            return {"hint_level": "nudge"}
-        return {"hint_level": "partial"}
+            return {"hint_level": "nudge", "explicit_hint_level": True}
+        return {"explicit_hint_level": False}
 
     def get_intent_description(self, intent: Intent) -> str:
         """Get human-readable description of intent"""
